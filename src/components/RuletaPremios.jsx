@@ -18,33 +18,26 @@ const RuletaPremios = () => {
       if (premioGuardado) {
         const premio = JSON.parse(premioGuardado);
         setPremioGanado(premio);
-        const indice = premiosRuletaBienvenida.findIndex(p => p.id === premio.id);
-        if (indice !== -1) {
-          setIndicePremioGanado(indice);
-        }
+        const indice = premiosRuletaBienvenida.findIndex((p) => p.id === premio.id);
+        if (indice !== -1) setIndicePremioGanado(indice);
       }
     }
   }, []);
 
   const girarRuleta = () => {
     if (yaGiro || girando) return;
-
     setGirando(true);
     setPremioGanado(null);
     setIndicePremioGanado(null);
 
     const indicePremio = Math.floor(Math.random() * premiosRuletaBienvenida.length);
     const premioAleatorio = premiosRuletaBienvenida[indicePremio];
-
     const anguloSegmento = 360 / premiosRuletaBienvenida.length;
     const anguloPremio = indicePremio * anguloSegmento;
-    const rotacionesCompletas = 5 + Math.random() * 3;
-    const rotacionTotal = rotacionesCompletas * 360 + (360 - anguloPremio) + anguloSegmento / 2;
-    
-    setRotacionFinal(rotacionFinal + rotacionTotal);
+    const rotacionTotal = (5 + Math.random() * 3) * 360 + (360 - anguloPremio) + anguloSegmento / 2;
+    setRotacionFinal((r) => r + rotacionTotal);
 
-    const duracionRotacion = 3000 + Math.random() * 2000;
-
+    const duracionRotacion = 3000 + Math.random() * 1500;
     setTimeout(() => {
       setPremioGanado(premioAleatorio);
       setIndicePremioGanado(indicePremio);
@@ -55,207 +48,101 @@ const RuletaPremios = () => {
     }, duracionRotacion);
   };
 
-  const mostrarMensajeLegal = () => {
-    setMostrarMensaje(true);
-    setTimeout(() => setMostrarMensaje(false), 3000);
-  };
-
   const anguloSegmento = 360 / premiosRuletaBienvenida.length;
-  const radio = 140;
-  const tamañoRuleta = 320;
+  const tamañoRuleta = 340;
+  const radioTexto = 132;
+  const coloresSegmentos = [
+    '#e8f5e9', '#c8e6c9', '#a5d6a7', '#81c784',
+    '#66bb6a', '#4caf50', '#43a047', '#2e7d32',
+  ];
 
   return (
-    <div className="min-h-screen p-4 pt-24 pb-28 flex flex-col items-center justify-center relative">
-      {/* Elementos decorativos tropicales */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <motion.div
-          className="absolute top-20 left-10 text-5xl opacity-10"
-          animate={{ y: [0, -15, 0], rotate: [0, 8, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          🌿
-        </motion.div>
-        <motion.div
-          className="absolute top-32 right-15 text-4xl opacity-10"
-          animate={{ y: [0, 12, 0], rotate: [0, -5, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          🌱
-        </motion.div>
-        <motion.div
-          className="absolute bottom-32 left-15 text-4xl opacity-10"
-          animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
-          transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          🍃
-        </motion.div>
-        <motion.div
-          className="absolute bottom-20 right-10 text-5xl opacity-10"
-          animate={{ y: [0, 15, 0], rotate: [0, -8, 0] }}
-          transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          🌴
-        </motion.div>
-      </div>
-
+    <div className="min-h-screen pt-24 pb-28 px-4 flex flex-col items-center bg-gradient-to-b from-menu-cream/20 to-menu-green-dark/30">
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-8 relative z-10"
+        className="text-center mb-8"
       >
-        <h2 className="text-3xl font-elegant font-bold text-shadow-glow mb-2">
-          🌿 Ruleta de Bienvenida
-        </h2>
-        <p className="text-white/70 text-sm">
+        <h1 className="text-2xl sm:text-3xl font-elegant font-bold text-menu-green-dark mb-1">
+          Ruleta de bienvenida
+        </h1>
+        <p className="text-menu-green-dark/80 text-sm">
           Gira y gana un descuento especial
         </p>
       </motion.div>
 
-      <div className="relative mb-8 z-10" style={{ width: `${tamañoRuleta}px`, height: `${tamañoRuleta}px` }}>
+      <div className="relative mb-8" style={{ width: tamañoRuleta + 24, height: tamañoRuleta + 24 }}>
         <motion.div
-          className="relative w-full h-full rounded-full overflow-visible border-4 border-green-primary shadow-2xl"
-          animate={{
-            rotate: rotacionFinal,
-            scale: indicePremioGanado !== null && !girando ? [1, 1.1, 1] : 1,
-          }}
+          className="absolute inset-0 rounded-full bg-white/90 shadow-xl border-4 border-menu-cream flex items-center justify-center"
+          style={{ padding: 12 }}
+          animate={{ rotate: rotacionFinal }}
           transition={{
-            rotate: {
-              duration: girando ? 3 + Math.random() * 2 : 0,
-              ease: 'easeOut',
-            },
-            scale: {
-              duration: 0.5,
-              times: [0, 0.5, 1],
-            },
-          }}
-          style={{
-            background: `conic-gradient(
-              ${premiosRuletaBienvenida.map((premio, index) => {
-                const esGanador = indicePremioGanado === index && !girando;
-                const colorBase = index % 2 === 0 ? '#1a1a1a' : '#2a2a2a';
-                const colorSegmento = esGanador ? '#22c55e' : colorBase;
-                return `${colorSegmento} ${index * anguloSegmento}deg ${(index + 1) * anguloSegmento}deg`;
-              }).join(', ')}
-            )`,
+            rotate: { duration: girando ? 3.5 : 0, ease: [0.2, 0.8, 0.2, 1] },
           }}
         >
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox={`0 0 ${tamañoRuleta} ${tamañoRuleta}`}
-          >
+          <div
+            className="w-full h-full rounded-full overflow-hidden"
+            style={{
+              background: `conic-gradient(
+                ${premiosRuletaBienvenida.map((_, i) => {
+                  const color = coloresSegmentos[i % coloresSegmentos.length];
+                  return `${color} ${i * anguloSegmento}deg ${(i + 1) * anguloSegmento}deg`;
+                }).join(', ')}
+              )`,
+            }}
+          />
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox={`0 0 ${tamañoRuleta} ${tamañoRuleta}`}>
             {premiosRuletaBienvenida.map((premio, index) => {
               const anguloRad = (index * anguloSegmento + anguloSegmento / 2) * (Math.PI / 180);
-              const centroX = tamañoRuleta / 2;
-              const centroY = tamañoRuleta / 2;
-              const radioTexto = radio;
-              const x = centroX + Math.cos(anguloRad) * radioTexto;
-              const y = centroY + Math.sin(anguloRad) * radioTexto;
-              const anguloGrados = (anguloRad * 180) / Math.PI;
-              const esGanador = indicePremioGanado === index && !girando;
-
+              const cx = tamañoRuleta / 2 + Math.cos(anguloRad) * radioTexto;
+              const cy = tamañoRuleta / 2 + Math.sin(anguloRad) * radioTexto;
+              const rot = (anguloRad * 180) / Math.PI + 90;
+              const texto = premio.corto || premio.texto;
               return (
-                <g key={premio.id} transform={`translate(${x}, ${y}) rotate(${anguloGrados + 90})`}>
-                  <text
-                    x="0"
-                    y="0"
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="white"
-                    style={{
-                      fontSize: esGanador ? '13px' : '11px',
-                      fontWeight: esGanador ? '700' : '600',
-                      filter: esGanador 
-                        ? 'drop-shadow(0 0 6px rgba(34, 197, 94, 0.9)) drop-shadow(0 0 12px rgba(34, 197, 94, 0.5))' 
-                        : 'drop-shadow(1px 1px 3px rgba(0,0,0,0.9))',
-                      fontFamily: 'Inter, sans-serif',
-                    }}
-                  >
-                    {premio.texto}
+                <g key={premio.id} transform={`translate(${cx}, ${cy}) rotate(${rot})`}>
+                  <text x="0" y="0" textAnchor="middle" dominantBaseline="middle" fill="#1a3d32" fontSize="13" fontWeight="700" fontFamily="Inter, sans-serif">
+                    {texto}
                   </text>
                 </g>
               );
             })}
           </svg>
-
-          {indicePremioGanado !== null && !girando && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ 
-                opacity: [0, 1, 1, 0],
-                scale: [0, 1.2, 1.1, 1.2],
-              }}
-              transition={{
-                duration: 1.5,
-                times: [0, 0.3, 0.7, 1],
-                repeat: 2,
-              }}
-              className="absolute rounded-full border-4 border-green-primary"
-              style={{
-                width: `${tamañoRuleta + 20}px`,
-                height: `${tamañoRuleta + 20}px`,
-                top: '-10px',
-                left: '-10px',
-                boxShadow: '0 0 30px rgba(34, 197, 94, 0.6)',
-              }}
-            />
-          )}
         </motion.div>
 
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
-          <motion.div
-            animate={indicePremioGanado !== null && !girando ? {
-              scale: [1, 1.3, 1],
-              rotate: [0, 10, -10, 0],
-            } : {}}
-            transition={{
-              duration: 0.6,
-              repeat: indicePremioGanado !== null && !girando ? 2 : 0,
-            }}
-            className="w-0 h-0 border-transparent"
-            style={{
-              borderLeftWidth: '10px',
-              borderRightWidth: '10px',
-              borderTopWidth: '16px',
-              borderTopColor: '#22c55e',
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))',
-            }}
-          />
+        <div className="absolute -top-1 left-1/2 -translate-x-1/2 z-10">
+          <div className="w-0 h-0 border-l-[12px] border-r-[12px] border-t-[20px] border-l-transparent border-r-transparent border-t-menu-green-dark drop-shadow-md" />
         </div>
       </div>
 
       <motion.button
         onClick={girarRuleta}
         disabled={yaGiro || girando}
-        className={`px-8 py-4 rounded-full font-bold text-lg ${
+        className={`relative z-10 w-full max-w-xs py-4 rounded-2xl font-bold text-lg transition-all ${
           yaGiro || girando
-            ? 'bg-white/20 text-white/50 cursor-not-allowed'
-            : 'bg-green-primary text-bar-dark hover:bg-green-light'
-        } transition-all shadow-lg relative z-10`}
-        whileTap={!yaGiro && !girando ? { scale: 0.95 } : {}}
-        whileHover={!yaGiro && !girando ? { scale: 1.05 } : {}}
+            ? 'bg-menu-cream/40 text-menu-green-dark/50 cursor-not-allowed'
+            : 'bg-menu-green-dark text-menu-cream hover:bg-menu-green-bar active:scale-[0.98]'
+        }`}
+        whileTap={!yaGiro && !girando ? { scale: 0.98 } : {}}
       >
-        {girando ? 'Girando...' : yaGiro ? 'Ya giraste la ruleta' : 'Girar Ruleta'}
+        {girando ? 'Girando…' : yaGiro ? 'Ya usaste tu giro' : 'Girar ruleta'}
       </motion.button>
 
       <button
-        onClick={mostrarMensajeLegal}
-        className="mt-4 text-xs text-white/50 underline relative z-10"
+        onClick={() => { setMostrarMensaje(true); setTimeout(() => setMostrarMensaje(false), 3500); }}
+        className="mt-4 text-xs text-menu-green-dark/60 underline"
       >
-        Ver términos y condiciones
+        Términos y condiciones
       </button>
 
       <AnimatePresence>
         {mostrarMensaje && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="mt-4 p-4 bg-white/10 rounded-lg border border-green-primary/30 max-w-sm relative z-10"
+            exit={{ opacity: 0 }}
+            className="mt-4 p-4 rounded-2xl bg-white/95 text-menu-green-dark text-xs text-center max-w-sm shadow-lg border border-menu-cream/30"
           >
-            <p className="text-xs text-center text-white/80">
-              ⚖️ Solo una promoción válida por cuenta/mesa. 
-              Válido solo para consumo en el establecimiento.
-            </p>
+            Una promoción por cuenta/mesa. Válido en el establecimiento.
           </motion.div>
         )}
       </AnimatePresence>
@@ -263,20 +150,16 @@ const RuletaPremios = () => {
       <AnimatePresence>
         {premioGanado && !girando && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            className="mt-8 p-6 border-2 border-green-primary rounded-lg text-center shadow-2xl relative z-10"
-            style={{
-              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(16, 185, 129, 0.25) 100%)',
-              backdropFilter: 'blur(10px)',
-            }}
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="mt-8 w-full max-w-sm p-6 rounded-2xl bg-white shadow-xl border-2 border-menu-cream text-center"
           >
-            <h3 className="text-2xl font-elegant font-bold text-green-light mb-2">
-              🌿 ¡Felicidades!
-            </h3>
-            <p className="text-xl font-semibold mb-1 text-white">{premioGanado.texto}</p>
-            <p className="text-sm text-white/90">
+            <span className="text-menu-green-dark font-elegant text-xl font-bold block mb-2">
+              ¡Felicidades!
+            </span>
+            <p className="text-menu-green-dark font-bold text-lg mb-1">{premioGanado.texto}</p>
+            <p className="text-menu-green-dark/70 text-sm">
               Muestra este mensaje al mesero para aplicar tu promoción
             </p>
           </motion.div>
@@ -287,4 +170,3 @@ const RuletaPremios = () => {
 };
 
 export default RuletaPremios;
-

@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 
 const navItems = [
-  { id: 'inicio', label: 'Inicio' },
   { id: 'menu', label: 'Menú' },
   { id: 'ruleta-premios', label: 'Premios' },
   { id: 'ruleta-consumo', label: 'Ruleta' },
@@ -15,15 +14,13 @@ const Header = ({ vistaActiva, onNavigate }) => {
       animate={{ opacity: 1, y: 0 }}
       className="fixed top-0 left-0 right-0 z-50 px-6 py-5 flex items-center justify-between bg-black/20 backdrop-blur-md border-b border-white/5"
     >
-      {/* Logo */}
       <button
-        onClick={() => onNavigate('inicio')}
-        className="font-elegant text-xl md:text-2xl font-semibold tracking-wide text-white/95 hover:text-green-primary transition-colors"
+        onClick={() => onNavigate('menu')}
+        className="font-slab text-lg md:text-xl font-semibold tracking-wide text-menu-cream hover:text-menu-cream-light transition-colors uppercase"
       >
         THE GREEN GARDEN
       </button>
 
-      {/* Navegación + redes */}
       <nav className="flex items-center gap-6 md:gap-8">
         <div className="hidden sm:flex items-center gap-5 md:gap-7">
           {navItems.map((item) => (
@@ -32,8 +29,8 @@ const Header = ({ vistaActiva, onNavigate }) => {
               onClick={() => onNavigate(item.id)}
               className={`text-sm font-body font-medium tracking-wide transition-colors ${
                 vistaActiva === item.id
-                  ? 'text-green-primary'
-                  : 'text-white/80 hover:text-amber-200/90'
+                  ? 'text-menu-cream'
+                  : 'text-menu-cream/80 hover:text-menu-cream-light'
               }`}
             >
               {item.label}
@@ -45,7 +42,7 @@ const Header = ({ vistaActiva, onNavigate }) => {
             href="https://www.instagram.com/thegreen_garden1"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white/80 hover:text-amber-200 transition-colors"
+            className="text-menu-cream/80 hover:text-menu-cream transition-colors"
             aria-label="Instagram"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -56,7 +53,7 @@ const Header = ({ vistaActiva, onNavigate }) => {
             href="https://twitter.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white/80 hover:text-amber-200 transition-colors"
+            className="text-menu-cream/80 hover:text-menu-cream transition-colors"
             aria-label="Twitter"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

@@ -7,7 +7,17 @@ export default {
   theme: {
     extend: {
       colors: {
+        'terra-bg': '#fafaf8',
+        'terra-dark': '#1a2e26',
+        'terra-green': '#2d5a4a',
+        'terra-border': '#e8e6e1',
         'bar-dark': '#0a0a0a',
+        'menu-green': '#1a3d32',
+        'menu-green-dark': '#152a22',
+        'menu-green-bar': '#234a3d',
+        'menu-cream': '#C7BEA2',
+        'menu-cream-light': '#E0DDCF',
+        'menu-beige': '#D7C8B3',
         'green-primary': '#22c55e',
         'green-light': '#4ade80',
         'green-dark': '#16a34a',
@@ -17,6 +27,8 @@ export default {
         'warm-glow': '#fbbf24',
       },
       fontFamily: {
+        'slab': ['Roboto Slab', 'serif'],
+        'script': ['Dancing Script', 'cursive'],
         'elegant': ['Playfair Display', 'serif'],
         'body': ['Inter', 'sans-serif'],
       },
@@ -24,4 +36,3 @@ export default {
   },
   plugins: [],
 }
-
