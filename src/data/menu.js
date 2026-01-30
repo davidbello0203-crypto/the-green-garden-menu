@@ -104,7 +104,7 @@ export const menuData = {
     },
     {
       id: 'botellas',
-      nombre: 'Botellas & Copas',
+      nombre: 'Botellas y Copeo',
       icono: '🍾',
       productos: [
         { id: 31, nombre: 'Bacardi blanco', precios: [{ etiqueta: 'Copa', precio: 50 }, { etiqueta: 'Botella', precio: 600 }] },
@@ -182,12 +182,12 @@ export const menuData = {
   ],
 };
 
-// 4 secciones del menú (como en las fotos): Bebidas, Comida, Snacks, Botellas y copas
+// 4 secciones del menú (como en las fotos): Bebidas, Comida, Snacks, Botellas y Copeo
 // Imágenes: comida/bebida al centro, sin fondos cargados (Unsplash)
 export const seccionesMenu = [
   {
     id: 'bebidas',
-    nombre: 'Bebidas',
+    nombre: "Drink's",
     icono: '🍺',
     imagen: 'https://images.unsplash.com/photo-1544148103-0773bf10d330?w=800&q=80',
     categoriaIds: ['cerveza', 'micheladas', 'mezcal', 'cantaritos', 'mojitos', 'cocteles', 'vodka', 'ron', 'ginebra', 'shot'],
@@ -208,7 +208,7 @@ export const seccionesMenu = [
   },
   {
     id: 'botellas',
-    nombre: 'Botellas y copas',
+    nombre: 'Botellas y Copeo',
     icono: '🍾',
     imagen: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=80',
     categoriaIds: ['botellas'],
@@ -217,22 +217,19 @@ export const seccionesMenu = [
 
 export const premiosRuletaBienvenida = [
   { id: 1, texto: '10% de descuento', corto: '10% desc.', tipo: 'descuento', valor: 10 },
-  { id: 2, texto: 'Shot gratis', corto: 'Shot gratis', tipo: 'shot', valor: 1 },
-  { id: 3, texto: '15% de descuento', corto: '15% desc.', tipo: 'descuento', valor: 15 },
-  { id: 4, texto: 'Cerveza gratis', corto: 'Cerveza', tipo: 'cerveza', valor: 1 },
-  { id: 5, texto: '5% de descuento', corto: '5% desc.', tipo: 'descuento', valor: 5 },
-  { id: 6, texto: 'Shot gratis', corto: 'Shot gratis', tipo: 'shot', valor: 1 },
-  { id: 7, texto: '20% de descuento', corto: '20% desc.', tipo: 'descuento', valor: 20 },
-  { id: 8, texto: 'Cerveza gratis', corto: 'Cerveza', tipo: 'cerveza', valor: 1 },
+  { id: 2, texto: '5% de descuento', corto: '5% desc.', tipo: 'descuento', valor: 5 },
+  { id: 3, texto: 'Shot gratis (Tequila sunrise, Blue kamikaze o mezcal)', corto: 'Shot a escoger', tipo: 'shot', valor: 1 },
+  { id: 4, texto: 'Dos cigarros', corto: '2 cigarros', tipo: 'cigarros', valor: 2 },
+  { id: 5, texto: 'Cerveza a escoger', corto: 'Cerveza a escoger', tipo: 'cerveza', valor: 1 },
 ];
 
 export const opcionesRuletaConsumo = [
-  { id: 1, texto: 'Siguiente ronda: Cubetazo', corto: 'Cubetazo', accion: 'cubetazo' },
+  { id: 1, texto: 'Ronda de cantaritos', corto: 'Ronda de cantaritos', accion: 'ronda-cantaritos' },
   { id: 2, texto: 'Shot de Tequila Baby Mango', corto: 'Shot Baby Mango', accion: 'shot-baby-mango' },
-  { id: 3, texto: 'Mezcal para todos', corto: 'Mezcal', accion: 'mezcal-todos' },
-  { id: 4, texto: 'Toma el de la izquierda', corto: 'Izquierda', accion: 'izquierda' },
-  { id: 5, texto: 'Ronda de cervezas', corto: 'Cervezas', accion: 'cervezas' },
-  { id: 6, texto: 'Shot de Tequila Tradicional', corto: 'Shot Trad.', accion: 'shot-tradicional' },
-  { id: 7, texto: 'Cubetazo especial', corto: 'Cubetazo', accion: 'cubetazo' },
-  { id: 8, texto: 'Toma el de la derecha', corto: 'Derecha', accion: 'derecha' },
+  { id: 3, texto: 'Mezcal para todos', corto: 'Mezcal para todos', accion: 'mezcal-todos' },
+  { id: 4, texto: 'Toman solo hombres', corto: 'Toman solo hombres', accion: 'solo-hombres' },
+  { id: 5, texto: 'Ronda de cervezas', corto: 'Ronda de cervezas', accion: 'cervezas' },
+  { id: 6, texto: 'Shot de Tequila Tradicional', corto: 'Shot Tradicional', accion: 'shot-tradicional' },
+  { id: 7, texto: 'Ronda de cantaritos', corto: 'Ronda de cantaritos', accion: 'ronda-cantaritos' },
+  { id: 8, texto: 'Toman solo mujeres', corto: 'Toman solo mujeres', accion: 'solo-mujeres' },
 ];

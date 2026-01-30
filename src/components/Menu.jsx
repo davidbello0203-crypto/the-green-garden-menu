@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { menuData, seccionesMenu } from '../data/menu';
+import FondoHojas from './FondoHojas';
 
-const Menu = () => {
+const Menu = ({ onAbrirTransferencia }) => {
   const [seccionActiva, setSeccionActiva] = useState('bebidas');
   const seccion = seccionesMenu.find((s) => s.id === seccionActiva);
 
@@ -17,24 +18,37 @@ const Menu = () => {
   const formatPrecio = (n) => `$${Number(n).toFixed(2)}`;
 
   const PrecioDisplay = ({ producto }) => {
+    const abrirTransferencia = (e) => {
+      e.stopPropagation();
+      onAbrirTransferencia?.();
+    };
+    const clasePrecio = 'inline-flex items-center px-2.5 py-1 rounded-lg bg-menu-cream text-menu-green-dark text-xs font-bold border border-menu-green-dark/40 cursor-pointer hover:bg-menu-green-dark/15 active:scale-[0.98] transition-colors';
     if (producto.precios && producto.precios.length > 0) {
       return (
         <div className="flex flex-wrap gap-1.5 justify-end">
           {producto.precios.map((p, i) => (
-            <span
+            <button
               key={i}
-              className="inline-flex items-center px-2.5 py-1 rounded-lg bg-menu-cream text-menu-green-dark text-xs font-bold border border-menu-green-dark/20"
+              type="button"
+              onClick={abrirTransferencia}
+              className={clasePrecio}
+              title="Ver datos para transferencia"
             >
               {p.etiqueta} {formatPrecio(p.precio)}
-            </span>
+            </button>
           ))}
         </div>
       );
     }
     return (
-      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-menu-cream text-menu-green-dark font-bold whitespace-nowrap text-xs border border-menu-green-dark/20">
+      <button
+        type="button"
+        onClick={abrirTransferencia}
+        className={clasePrecio + ' whitespace-nowrap'}
+        title="Ver datos para transferencia"
+      >
         {formatPrecio(producto.precio)}
-      </span>
+      </button>
     );
   };
 
@@ -43,106 +57,140 @@ const Menu = () => {
   const colDer = categoriasEnSeccion.slice(mitad);
   const usarDosColumnas = seccionActiva === 'bebidas' && categoriasEnSeccion.length > 4;
 
-  const BloqueCategoria = ({ cat }) => (
-    <section className="space-y-2">
-      <div className="bg-menu-green-bar px-3 py-2 rounded-lg flex items-center gap-2">
-        <span className="text-green-light/90 text-sm">🍃</span>
-        <h2 className="font-slab text-base font-bold text-menu-cream uppercase tracking-wide">
-          {cat.nombre}
-        </h2>
-      </div>
-      {cat.descripcionCategoria && (
-        <p className="text-menu-cream/80 text-xs italic">{cat.descripcionCategoria}</p>
-      )}
-      <div className="space-y-2">
-        {cat.productos.map((producto, index) => (
-          <motion.div
-            key={producto.id}
-            initial={{ opacity: 0, x: 6 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.02 }}
-            className="flex flex-wrap items-start justify-between gap-2 p-3 rounded-lg bg-menu-green-dark/60 border border-menu-cream/15"
-          >
-            <div className="flex-1 min-w-0">
-              <h3 className="font-body font-semibold text-menu-cream text-sm">{producto.nombre}</h3>
-              {producto.descripcion && (
-                <p className="text-menu-cream/75 text-xs mt-0.5">{producto.descripcion}</p>
-              )}
-            </div>
-            <PrecioDisplay producto={producto} />
-          </motion.div>
-        ))}
-      </div>
-    </section>
-  );
+  const BloqueCategoria = ({ cat, index }) => {
+    const esClara = index % 2 === 0;
+    return (
+      <section className="space-y-2">
+        <div className="px-3 py-2 rounded-lg flex items-center gap-2 bg-menu-cream">
+          <span className="text-sm text-menu-green-dark">🍃</span>
+          <h2 className="font-slab text-base font-bold uppercase tracking-wide text-menu-green-dark">
+            {cat.nombre}
+          </h2>
+        </div>
+        {cat.descripcionCategoria && (
+          <p className="text-xs italic text-menu-green-dark/75">{cat.descripcionCategoria}</p>
+        )}
+        <div className="space-y-2">
+          {cat.productos.map((producto, indexProd) => (
+            <motion.div
+              key={producto.id}
+              initial={{ opacity: 0, x: 8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: indexProd * 0.03, duration: 0.25 }}
+              whileHover={{ y: -2, transition: { duration: 0.2 } }}
+              className={`flex flex-wrap items-start justify-between gap-2 p-3 rounded-lg border ${esClara ? 'bg-menu-cream/50 border-menu-green-dark/20' : 'bg-menu-green-dark/60 border-menu-cream/15'}`}
+            >
+              <div className="flex-1 min-w-0">
+                <h3 className={`font-body font-semibold text-sm ${esClara ? 'text-menu-green-dark' : 'text-menu-cream'}`}>{producto.nombre}</h3>
+                {producto.descripcion && (
+                  <p className={`text-xs mt-0.5 ${esClara ? 'text-menu-green-dark/80' : 'text-menu-cream/75'}`}>{producto.descripcion}</p>
+                )}
+              </div>
+              <PrecioDisplay producto={producto} />
+            </motion.div>
+          ))}
+        </div>
+      </section>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-menu-green-dark pt-24 pb-28 relative overflow-hidden">
-      {/* Toque tropical: hojas sutiles de fondo */}
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.06]">
-        <span className="absolute top-24 left-6 text-4xl">🍃</span>
-        <span className="absolute top-40 right-8 text-3xl">🌿</span>
-        <span className="absolute bottom-48 left-10 text-3xl">🌱</span>
-        <span className="absolute bottom-32 right-6 text-4xl">🍃</span>
-      </div>
-
+      <FondoHojas />
       <div className="max-w-4xl mx-auto px-4 relative z-10">
         {/* Portada estilo menú: logo + MENU + redes */}
-        <div className="text-center mb-6">
-          <div className="inline-flex flex-col items-center justify-center w-20 h-20 rounded-full border-2 border-menu-cream mb-4">
+        <motion.div
+          className="text-center mb-6"
+          initial="oculto"
+          animate="visible"
+          variants={{
+            oculto: {},
+            visible: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+          }}
+        >
+          <motion.div
+            variants={{ oculto: { opacity: 0, scale: 0.9 }, visible: { opacity: 1, scale: 1 } }}
+            transition={{ duration: 0.35 }}
+            className="inline-flex flex-col items-center justify-center w-20 h-20 rounded-full border-2 border-menu-cream mb-4"
+          >
             <span className="text-menu-cream text-[9px] tracking-[0.2em] font-body uppercase">THE</span>
             <span className="text-menu-cream font-script text-2xl font-semibold">Green</span>
             <span className="text-menu-cream text-[9px] tracking-[0.2em] font-body uppercase">GARDEN</span>
-          </div>
-          <div className="flex items-center justify-center gap-2 mb-1">
+          </motion.div>
+          <motion.div
+            variants={{ oculto: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0 } }}
+            transition={{ duration: 0.3 }}
+            className="flex items-center justify-center gap-2 mb-1"
+          >
             <span className="text-green-light/80 text-lg">🍃</span>
             <h1 className="font-slab text-4xl md:text-5xl font-bold text-menu-cream tracking-tight uppercase">
               MENU
             </h1>
             <span className="text-green-light/80 text-lg">🍃</span>
-          </div>
-          <p className="text-menu-cream/70 text-xs font-body mt-2">The Green Garden</p>
-        </div>
+          </motion.div>
+          <motion.p
+            variants={{ oculto: { opacity: 0 }, visible: { opacity: 1 } }}
+            transition={{ duration: 0.3 }}
+            className="text-menu-cream/70 text-xs font-body mt-2"
+          >
+            The Green Garden
+          </motion.p>
+        </motion.div>
 
         {/* Tabs: se abre aquí mismo, transición suave */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-          {seccionesMenu.map((sec) => {
+        <motion.div
+          className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+        >
+          {seccionesMenu.map((sec, i) => {
             const estaActiva = seccionActiva === sec.id;
             return (
-              <button
+              <motion.button
                 key={sec.id}
                 onClick={() => setSeccionActiva(sec.id)}
-                className={`px-4 py-2.5 rounded-lg whitespace-nowrap font-slab font-semibold text-sm transition-all shrink-0 ${
+                className={`px-6 py-3.5 rounded-xl whitespace-nowrap font-slab font-semibold text-lg transition-colors shrink-0 ${
                   estaActiva
-                    ? 'bg-menu-cream text-menu-green-dark shadow-md'
-                    : 'bg-menu-green-bar/90 text-menu-cream hover:bg-menu-cream/25 hover:text-menu-cream'
+                    ? 'bg-menu-green-bar text-menu-cream shadow-md'
+                    : 'bg-menu-cream text-menu-green-dark hover:bg-menu-green-bar/30 hover:text-menu-cream'
                 }`}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.25 + i * 0.04 }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
               >
                 {sec.icono} {sec.nombre}
-              </button>
+              </motion.button>
             );
           })}
-        </div>
+        </motion.div>
 
         <AnimatePresence mode="wait">
           {seccion && (
             <motion.div
               key={seccionActiva}
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
               className="space-y-6"
             >
               {/* Imagen de la sección: comida/bebida sin fondos cargados */}
               {seccion.imagen && (
-                <div className="rounded-2xl overflow-hidden border-2 border-menu-cream/25 shadow-xl">
+                <motion.div
+                  className="rounded-2xl overflow-hidden border-2 border-menu-cream/25 shadow-xl"
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1, duration: 0.35 }}
+                >
                   <img
                     src={seccion.imagen}
                     alt={seccion.nombre}
                     className="w-full h-48 sm:h-56 object-cover object-center"
                   />
-                </div>
+                </motion.div>
               )}
 
               {usarDosColumnas ? (
@@ -168,19 +216,6 @@ const Menu = () => {
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Pie como en la portada del menú */}
-        <footer className="mt-12 pt-6 border-t border-menu-cream/20 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-menu-cream/80 text-sm font-body">
-          <a href="https://www.facebook.com/The_GreenGarden" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-menu-cream transition-colors">
-            <span className="font-semibold">f</span>
-            <span>The_GreenGarden</span>
-          </a>
-          <span className="flex items-center gap-2">
-            <span>📍</span>
-            <span>Tixtla Gro.</span>
-          </span>
-          <span className="text-menu-cream font-medium">#todosagreen</span>
-        </footer>
       </div>
     </div>
   );
