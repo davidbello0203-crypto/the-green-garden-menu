@@ -23,13 +23,16 @@ function App() {
   const esRuleta = vistaActiva === 'ruleta-premios' || vistaActiva === 'ruleta-consumo';
   const mostrarBarraEnvios = vistaActiva === 'menu' && seccionMenuActiva !== 'botellas';
 
+  // Color de fondo según la vista
+  const fondoVista = esRuleta ? 'bg-arena' : 'bg-bar-dark';
+
   return (
-    <div className="min-h-screen bg-bar-dark">
+    <div className={`min-h-screen ${fondoVista}`}>
       {/* Header fijo - altura ~80px */}
       <Header onNavigate={setVistaActiva} />
 
       {/* Contenido principal: padding abajo para nav y, si aplica, barra de envíos */}
-      <main className={`pt-[68px] bg-bar-dark ${mostrarBarraEnvios ? 'pb-32' : 'pb-24'}`}>
+      <main className={`pt-[68px] ${fondoVista} ${mostrarBarraEnvios ? 'pb-32' : 'pb-24'}`}>
         <AnimatePresence mode="wait">
           {vistaActiva === 'menu' && (
             <motion.div
@@ -82,31 +85,34 @@ function App() {
         </AnimatePresence>
       </main>
 
-      {/* Barra de envíos a domicilio: fija encima del nav, fuera del scroll */}
-      {mostrarBarraEnvios && <AnuncioEnvios />}
-
       {!esRuleta && <BurbujaTransferencia abierto={burbujaAbierta} onToggle={setBurbujaAbierta} />}
 
-      {/* Barra de navegación fija abajo - altura 80px (pb-20) */}
-      <nav className="fixed bottom-0 left-0 right-0 h-20 bg-menu-green-dark/95 backdrop-blur-md border-t border-menu-cream/20 px-2 py-3 z-40 safe-area-bottom">
-        <div className="flex justify-around items-center max-w-md mx-auto">
-          {navegacionItems.map((item) => (
-            <motion.button
-              key={item.id}
-              onClick={() => setVistaActiva(item.id)}
-              className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-all ${
-                vistaActiva === item.id
-                  ? 'bg-menu-cream/20 text-menu-cream'
-                  : 'text-menu-cream/50 hover:text-menu-cream/80'
-              }`}
-              whileTap={{ scale: 0.95 }}
-            >
-              <span className="text-lg">{item.icono}</span>
-              <span className="text-[10px] font-medium">{item.label}</span>
-            </motion.button>
-          ))}
-        </div>
-      </nav>
+      {/* Contenedor fijo abajo: barra de envíos + navegación */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 safe-area-bottom">
+        {/* Barra de envíos a domicilio */}
+        {mostrarBarraEnvios && <AnuncioEnvios />}
+
+        {/* Barra de navegación */}
+        <nav className="bg-menu-green-dark border-t border-menu-cream/20 px-2 pt-3 pb-3">
+          <div className="flex justify-around items-center max-w-md mx-auto">
+            {navegacionItems.map((item) => (
+              <motion.button
+                key={item.id}
+                onClick={() => setVistaActiva(item.id)}
+                className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-all ${
+                  vistaActiva === item.id
+                    ? 'bg-menu-cream/20 text-menu-cream'
+                    : 'text-menu-cream/50 hover:text-menu-cream/80'
+                }`}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-lg">{item.icono}</span>
+                <span className="text-[10px] font-medium">{item.label}</span>
+              </motion.button>
+            ))}
+          </div>
+        </nav>
+      </div>
     </div>
   );
 }

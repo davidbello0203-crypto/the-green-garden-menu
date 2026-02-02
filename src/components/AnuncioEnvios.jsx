@@ -5,7 +5,7 @@ const AnuncioEnvios = () => {
   const urlWhatsApp = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(MENSAJE_POR_DEFECTO)}`;
 
   return (
-    <div className="fixed inset-x-0 bottom-20 z-40 bg-menu-green-bar border-t border-menu-cream/20 px-3 py-1.5 flex items-center justify-center gap-3">
+    <div className="bg-menu-green-bar border-t border-menu-cream/20 px-3 py-1.5 flex items-center justify-center gap-3">
       <span className="text-menu-cream/90 text-xs font-body">
         🛵 Envíos a domicilio
       </span>

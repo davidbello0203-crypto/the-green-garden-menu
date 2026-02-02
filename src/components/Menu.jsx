@@ -16,12 +16,43 @@ const Menu = ({ onAbrirTransferencia, onSeccionChange, initialSeccion }) => {
   const tabRefs = useRef({});
   const [copiadoTarjeta, setCopiadoTarjeta] = useState(false);
 
-  const copiarTarjeta = () => {
+  const copiarTarjeta = async () => {
     const texto = DATOS_TRANSFERENCIA.numeroTarjeta.replace(/\s/g, '');
-    navigator.clipboard.writeText(texto).then(() => {
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(texto);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = texto;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        textArea.style.top = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
       setCopiadoTarjeta(true);
-      setTimeout(() => setCopiadoTarjeta(false), 2000);
-    });
+      setTimeout(() => setCopiadoTarjeta(false), 2500);
+    } catch (err) {
+      const textArea = document.createElement('textarea');
+      textArea.value = texto;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopiadoTarjeta(true);
+        setTimeout(() => setCopiadoTarjeta(false), 2500);
+      } catch (e) {
+        console.error('Error al copiar:', e);
+      }
+      document.body.removeChild(textArea);
+    }
   };
 
   // Al volver al menú desde otra vista, el componente se monta de nuevo con initialSeccion;
@@ -331,9 +362,22 @@ const Menu = ({ onAbrirTransferencia, onSeccionChange, initialSeccion }) => {
                 </div>
                 <button
                   onClick={copiarTarjeta}
-                  className="mt-2 w-full py-2.5 rounded-lg bg-menu-cream text-menu-green-dark font-semibold text-sm hover:bg-white transition-colors"
+                  className={`mt-2 w-full py-2.5 rounded-lg font-semibold text-sm transition-all ${
+                    copiadoTarjeta
+                      ? 'bg-green-500 text-white'
+                      : 'bg-menu-cream text-menu-green-dark hover:bg-white'
+                  }`}
                 >
-                  {copiadoTarjeta ? '¡Copiado!' : 'Copiar número de tarjeta'}
+                  {copiadoTarjeta ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      ¡Número copiado!
+                    </span>
+                  ) : (
+                    'Copiar número de tarjeta'
+                  )}
                 </button>
               </div>
             </div>

@@ -15,12 +15,46 @@ const BurbujaTransferencia = ({ abierto: abiertoExterno, onToggle }) => {
   const [copiadoTarjeta, setCopiadoTarjeta] = useState(false);
   const refPanel = useRef(null);
 
-  const copiarTarjeta = () => {
+  const copiarTarjeta = async () => {
     const texto = DATOS_TRANSFERENCIA.numeroTarjeta.replace(/\s/g, '');
-    navigator.clipboard.writeText(texto).then(() => {
+
+    try {
+      // Intenta usar la API moderna del clipboard
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(texto);
+      } else {
+        // Fallback para navegadores que no soportan clipboard API
+        const textArea = document.createElement('textarea');
+        textArea.value = texto;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        textArea.style.top = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
       setCopiadoTarjeta(true);
-      setTimeout(() => setCopiadoTarjeta(false), 2000);
-    });
+      setTimeout(() => setCopiadoTarjeta(false), 2500);
+    } catch (err) {
+      // Si falla, intenta el método alternativo
+      const textArea = document.createElement('textarea');
+      textArea.value = texto;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopiadoTarjeta(true);
+        setTimeout(() => setCopiadoTarjeta(false), 2500);
+      } catch (e) {
+        console.error('Error al copiar:', e);
+      }
+      document.body.removeChild(textArea);
+    }
   };
 
   useEffect(() => {
@@ -32,7 +66,7 @@ const BurbujaTransferencia = ({ abierto: abiertoExterno, onToggle }) => {
   }, [abierto, setAbierto]);
 
   return (
-    <div ref={refPanel} className="fixed bottom-32 right-3 z-50 flex flex-col items-end gap-2">
+    <div ref={refPanel} className="fixed right-3 z-50 flex flex-col items-end gap-2" style={{ bottom: 'calc(140px + env(safe-area-inset-bottom, 0px))' }}>
       <AnimatePresence>
         {abierto && (
           <motion.div
@@ -58,9 +92,22 @@ const BurbujaTransferencia = ({ abierto: abiertoExterno, onToggle }) => {
                 <button
                   type="button"
                   onClick={copiarTarjeta}
-                  className="mt-2 w-full py-2.5 rounded-lg bg-menu-cream text-menu-green-dark font-semibold text-sm hover:bg-menu-cream-light transition-colors"
+                  className={`mt-2 w-full py-2.5 rounded-lg font-semibold text-sm transition-all ${
+                    copiadoTarjeta
+                      ? 'bg-green-500 text-white'
+                      : 'bg-menu-cream text-menu-green-dark hover:bg-menu-cream-light'
+                  }`}
                 >
-                  {copiadoTarjeta ? '¡Copiado!' : 'Copiar número de tarjeta'}
+                  {copiadoTarjeta ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      ¡Número copiado!
+                    </span>
+                  ) : (
+                    'Copiar número de tarjeta'
+                  )}
                 </button>
               </div>
               <div>

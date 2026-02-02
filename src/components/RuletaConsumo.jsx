@@ -62,7 +62,7 @@ const RuletaConsumo = () => {
   const colorSegmento = (i) => i % 2 === 0 ? '#1F4B3F' : '#3E6B5A';
 
   return (
-    <div className="min-h-[calc(100vh-9rem)] bg-arena flex flex-col items-center justify-center px-4 py-6">
+    <div className="min-h-screen bg-arena flex flex-col items-center justify-start px-4 pt-6 pb-40" style={{ marginTop: '-1px', paddingTop: 'calc(1.5rem + 1px)' }}>
 
       {/* Título elegante */}
       <motion.div

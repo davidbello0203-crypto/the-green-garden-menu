@@ -5,7 +5,7 @@ const Header = ({ onNavigate }) => {
     <motion.header
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between bg-menu-green-dark/85 backdrop-blur-md border-b border-menu-cream/10"
+      className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between bg-menu-green-dark border-b border-menu-cream/10 safe-area-top"
     >
       <button
         onClick={() => onNavigate('menu')}
