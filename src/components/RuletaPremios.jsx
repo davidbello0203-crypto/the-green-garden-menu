@@ -137,7 +137,7 @@ const RuletaPremios = () => {
   const colorSegmento = (i) => i % 2 === 0 ? '#1F4B3F' : '#3E6B5A';
 
   return (
-    <div className="min-h-screen bg-arena flex flex-col items-center justify-start px-4 pt-6 pb-40" style={{ marginTop: '-1px', paddingTop: 'calc(1.5rem + 1px)' }}>
+    <div className="min-h-[calc(100vh-68px)] bg-arena flex flex-col items-center justify-start px-4 pt-6 pb-8">
 
       {/* Título elegante */}
       <motion.div
@@ -314,10 +314,10 @@ const RuletaPremios = () => {
           {premioGanado && !girando ? (
             <motion.div
               key="resultado"
-              initial={{ opacity: 0, scale: 0.8, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.4, ease: 'easeOut' }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
               className="p-5 rounded-xl text-center shadow-xl border-2"
               style={{
                 backgroundColor: '#1F4B3F',

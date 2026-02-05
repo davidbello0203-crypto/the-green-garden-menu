@@ -15,6 +15,13 @@ const BurbujaTransferencia = ({ abierto: abiertoExterno, onToggle }) => {
   const [copiadoTarjeta, setCopiadoTarjeta] = useState(false);
   const refPanel = useRef(null);
 
+  // Estado para posición de la burbuja
+  const [position, setPosition] = useState({ x: 0, y: 0, side: 'right' });
+  const [isDragging, setIsDragging] = useState(false);
+  const [wasDragged, setWasDragged] = useState(false);
+  const dragStart = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
+  const bubbleRef = useRef(null);
+
   const copiarTarjeta = async () => {
     const texto = DATOS_TRANSFERENCIA.numeroTarjeta.replace(/\s/g, '');
 
@@ -65,17 +72,117 @@ const BurbujaTransferencia = ({ abierto: abiertoExterno, onToggle }) => {
     return () => document.removeEventListener('click', cerrarAlClicFuera);
   }, [abierto, setAbierto]);
 
+  // Funciones de drag
+  const handleDragStart = (e) => {
+    e.preventDefault();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    dragStart.current = {
+      x: clientX,
+      y: clientY,
+      posX: position.x,
+      posY: position.y
+    };
+    setIsDragging(true);
+    setWasDragged(false);
+  };
+
+  const handleDrag = (e) => {
+    if (!isDragging) return;
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const deltaX = clientX - dragStart.current.x;
+    const deltaY = clientY - dragStart.current.y;
+
+    // Si se movió más de 5px, consideramos que fue un drag
+    if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+      setWasDragged(true);
+    }
+
+    const newX = dragStart.current.posX + deltaX;
+    const newY = dragStart.current.posY + deltaY;
+
+    // Limitar Y para que no salga de la pantalla
+    // La burbuja está posicionada desde bottom: 140px
+    // maxY: máximo que puede bajar (hacia el bottom de la pantalla)
+    // minY: máximo que puede subir (hacia el top de la pantalla)
+    const bubbleSize = 64;
+    const bottomBase = 140;
+    const safeAreaTop = 100; // Espacio para el header
+    const safeAreaBottom = 20; // Espacio del borde inferior
+
+    const maxY = bottomBase - safeAreaBottom - bubbleSize; // No bajar más allá del borde
+    const minY = -(window.innerHeight - bottomBase - safeAreaTop - bubbleSize); // No subir más allá del header
+
+    setPosition(prev => ({
+      ...prev,
+      x: newX,
+      y: Math.max(minY, Math.min(maxY, newY))
+    }));
+  };
+
+  const handleDragEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+
+    // Determinar a qué lado debe ir (izquierda o derecha)
+    const bubble = bubbleRef.current;
+    if (!bubble) return;
+
+    const rect = bubble.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const screenCenter = window.innerWidth / 2;
+
+    const newSide = centerX < screenCenter ? 'left' : 'right';
+
+    setPosition(prev => ({
+      x: 0,
+      y: prev.y,
+      side: newSide
+    }));
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleDrag);
+      window.addEventListener('mouseup', handleDragEnd);
+      window.addEventListener('touchmove', handleDrag, { passive: false });
+      window.addEventListener('touchend', handleDragEnd);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleDrag);
+      window.removeEventListener('mouseup', handleDragEnd);
+      window.removeEventListener('touchmove', handleDrag);
+      window.removeEventListener('touchend', handleDragEnd);
+    };
+  }, [isDragging]);
+
   return (
-    <div ref={refPanel} className="fixed right-3 z-50 flex flex-col items-end gap-2" style={{ bottom: 'calc(140px + env(safe-area-inset-bottom, 0px))' }}>
+    <>
+      {/* Panel centrado - fuera del contenedor de la burbuja */}
       <AnimatePresence>
         {abierto && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 10 }}
-            transition={{ duration: 0.2 }}
-            className="w-80 max-w-[calc(100vw-2rem)] rounded-2xl border-2 border-menu-cream/30 bg-menu-green-dark shadow-xl overflow-hidden"
-          >
+          <>
+            {/* Overlay oscuro */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[55] bg-black/50"
+              onClick={() => setAbierto(false)}
+            />
+            {/* Panel */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              className="fixed z-[60] w-80 max-w-[calc(100vw-2rem)] rounded-2xl border-2 border-menu-cream/30 bg-menu-green-dark shadow-2xl overflow-hidden inset-0 m-auto h-fit"
+              onClick={(e) => e.stopPropagation()}
+            >
             <div className="px-5 py-4 bg-menu-green-bar border-b border-menu-cream/20">
               <h3 className="font-slab font-bold text-menu-cream text-base uppercase tracking-wide">
                 Datos de transferencia
@@ -116,22 +223,43 @@ const BurbujaTransferencia = ({ abierto: abiertoExterno, onToggle }) => {
               </div>
             </div>
           </motion.div>
+          </>
         )}
       </AnimatePresence>
 
-      <motion.button
-        type="button"
-        onClick={(e) => { e.stopPropagation(); setAbierto(!abierto); }}
-        className="flex items-center justify-center w-12 h-12 rounded-full bg-menu-cream text-menu-green-dark shadow-md border border-menu-green-dark/30 hover:bg-menu-cream-light transition-colors"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label="Ver datos de transferencia"
+      {/* Burbuja draggable */}
+      <div
+        ref={refPanel}
+        className={`fixed z-50 ${position.side === 'right' ? 'right-3' : 'left-3'}`}
+        style={{
+          bottom: `calc(140px + env(safe-area-inset-bottom, 0px))`,
+          transform: `translate(${position.x}px, ${position.y}px)`,
+          transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-        </svg>
-      </motion.button>
-    </div>
+        <button
+          ref={bubbleRef}
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!wasDragged) {
+              setAbierto(!abierto);
+            }
+          }}
+          onMouseDown={handleDragStart}
+          onTouchStart={handleDragStart}
+          className={`flex items-center justify-center w-16 h-16 rounded-full bg-menu-cream text-menu-green-dark shadow-lg border-2 border-menu-green-dark/30 hover:bg-menu-cream-light active:scale-95 transition-colors select-none touch-none ${isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab'}`}
+          style={{
+            animation: abierto || isDragging ? 'none' : 'pulse-slow 2.5s ease-in-out infinite',
+          }}
+          aria-label="Ver datos de transferencia"
+        >
+          <svg className="w-7 h-7 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+        </button>
+      </div>
+    </>
   );
 };
 

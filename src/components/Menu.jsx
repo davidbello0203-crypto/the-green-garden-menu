@@ -1,13 +1,15 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { menuData, seccionesMenu } from '../data/menu';
-import FondoTropical from './FondoTropical';
 
 const DATOS_TRANSFERENCIA = {
   banco: 'BBVA',
   numeroTarjeta: '4152 3142 3861 4344',
   titular: 'Carlos Sinai Martinez',
 };
+
+const NUMERO_WHATSAPP = '527472544725';
+const MENSAJE_COCINA = 'Hola, quisiera hacer una orden de la seccion de cocina';
 
 const Menu = ({ onAbrirTransferencia, onSeccionChange, initialSeccion }) => {
   const [seccionActiva, setSeccionActiva] = useState(initialSeccion ?? 'bebidas');
@@ -92,17 +94,17 @@ const Menu = ({ onAbrirTransferencia, onSeccionChange, initialSeccion }) => {
 
   const formatPrecio = (n) => `$${Number(n).toFixed(2)}`;
 
-  const PrecioDisplay = ({ producto }) => {
+  const PrecioDisplay = ({ producto, enFilaCompleta }) => {
     const abrirTransferencia = (e) => {
       e.stopPropagation();
       onAbrirTransferencia?.();
     };
-    const clasePrecio = 'inline-flex items-center px-3 py-1.5 rounded-lg bg-menu-cream text-menu-green-bar text-xs font-bold cursor-pointer hover:bg-white active:scale-[0.98] transition-all shadow-md';
-    const muchosPrecios = producto.precios && producto.precios.length >= 4;
+    const clasePrecio = 'inline-flex items-center px-3 py-2 rounded-lg bg-menu-cream text-menu-green-bar text-xs font-bold cursor-pointer hover:bg-white active:scale-[0.98] transition-all shadow-md';
+    
     if (producto.precios && producto.precios.length > 0) {
       return (
-        <div className={muchosPrecios ? 'w-full mt-2' : 'flex flex-wrap gap-1.5 justify-end'}>
-          <div className={`flex flex-wrap ${muchosPrecios ? 'gap-2 justify-start' : 'gap-1.5 justify-end'}`}>
+        <div className={enFilaCompleta ? 'w-full mt-4' : 'flex flex-wrap gap-2 justify-end'}>
+          <div className={`flex flex-wrap ${enFilaCompleta ? 'gap-3 justify-center' : 'gap-2 justify-end'}`}>
             {producto.precios.map((p, i) => (
               <button
                 key={i}
@@ -157,32 +159,32 @@ const Menu = ({ onAbrirTransferencia, onSeccionChange, initialSeccion }) => {
             <p className={`text-sm font-medium ${esClara ? 'text-menu-green-dark/80' : 'text-menu-cream/90'}`}>{cat.descripcionCategoria}</p>
           </div>
         )}
-        <div className="space-y-2">
+        <div className="space-y-3">
           {cat.productos.map((producto, indexProd) => {
-            const muchasOpciones = producto.precios && producto.precios.length >= 4;
+            const cantidadPrecios = producto.precios?.length || 0;
+            const enFilaCompleta = cantidadPrecios >= 3;
+
             return (
-              <motion.div
+              <div
                 key={producto.id}
-                initial={{ opacity: 0, x: 8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: indexProd * 0.03, duration: 0.25 }}
-                whileHover={{ y: -2, transition: { duration: 0.2 } }}
-                className={`flex flex-wrap items-start justify-between gap-2 rounded-xl backdrop-blur-sm ${
-                  muchasOpciones ? 'p-3 pb-4' : 'p-3'
-                } ${
+                className={`rounded-xl p-4 ${
                   esClara
                     ? 'bg-menu-cream/50 border border-menu-green-dark/20'
                     : 'bg-menu-green-dark/60 border border-menu-cream/15'
-                }`}
+                } ${enFilaCompleta ? 'text-center' : 'flex flex-wrap items-start justify-between gap-3'}`}
               >
-                <div className="flex-1 min-w-0">
-                  <h3 className={`font-body font-semibold text-sm ${esClara ? 'text-menu-green-dark' : 'text-menu-cream'}`}>{producto.nombre}</h3>
+                <div className={enFilaCompleta ? 'mb-2' : 'flex-1 min-w-0'}>
+                  <h3 className={`font-body font-semibold text-base ${esClara ? 'text-menu-green-dark' : 'text-menu-cream'}`}>
+                    {producto.nombre}
+                  </h3>
                   {producto.descripcion && (
-                    <p className={`text-xs mt-0.5 ${esClara ? 'text-menu-green-dark/70' : 'text-menu-cream/65'}`}>{producto.descripcion}</p>
+                    <p className={`text-xs mt-1 ${esClara ? 'text-menu-green-dark/70' : 'text-menu-cream/65'}`}>
+                      {producto.descripcion}
+                    </p>
                   )}
                 </div>
-                <PrecioDisplay producto={producto} />
-              </motion.div>
+                <PrecioDisplay producto={producto} enFilaCompleta={enFilaCompleta} />
+              </div>
             );
           })}
         </div>
@@ -191,8 +193,7 @@ const Menu = ({ onAbrirTransferencia, onSeccionChange, initialSeccion }) => {
   };
 
   return (
-    <div className="bg-black pt-4 pb-8 min-h-[calc(100vh-68px)] relative overflow-hidden">
-      <FondoTropical />
+    <div className="pt-4 pb-4 min-h-[calc(100vh-68px)] relative">
       <div className="max-w-4xl mx-auto px-4 relative z-10">
         {/* Portada estilo menú: logo + MENU + redes */}
         <motion.div
@@ -327,12 +328,45 @@ const Menu = ({ onAbrirTransferencia, onSeccionChange, initialSeccion }) => {
           )}
         </AnimatePresence>
 
+        {/* Sección de envío a domicilio - solo para Comida y Snacks */}
+        {(seccionActiva === 'comida' || seccionActiva === 'snacks') && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.3 }}
+            className="mt-10 mb-4"
+          >
+            <div className="bg-menu-green-dark/80 backdrop-blur-sm rounded-2xl border border-menu-cream/20 p-5 shadow-lg text-center">
+              <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-menu-cream/20 text-2xl mb-3">
+                🛵
+              </span>
+              <h3 className="font-slab font-bold text-menu-cream text-sm uppercase tracking-wide mb-1">
+                Envíos a domicilio
+              </h3>
+              <p className="text-menu-cream/70 text-sm mb-4">
+                Pide por WhatsApp y te llevamos
+              </p>
+              <a
+                href={`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(MENSAJE_COCINA)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-green-600 hover:bg-green-500 text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all active:scale-[0.98]"
+              >
+                <svg className="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
+                747 254 4725 — Pedir por WhatsApp
+              </a>
+            </div>
+          </motion.div>
+        )}
+
         {/* Sección de datos de transferencia */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.3 }}
-          className="mt-10 mb-4"
+          transition={{ delay: (seccionActiva === 'comida' || seccionActiva === 'snacks') ? 0.5 : 0.4, duration: 0.3 }}
+          className={`${(seccionActiva === 'comida' || seccionActiva === 'snacks') ? 'mb-4' : 'mt-10 mb-4'}`}
         >
           <div className="bg-menu-green-dark/80 backdrop-blur-sm rounded-2xl border border-menu-cream/20 p-5 shadow-lg">
             <div className="flex items-center gap-2 mb-4">

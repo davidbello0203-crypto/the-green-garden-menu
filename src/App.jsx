@@ -7,6 +7,7 @@ import RuletaPremios from './components/RuletaPremios';
 import RuletaConsumo from './components/RuletaConsumo';
 import Visitar from './components/Visitar';
 import BurbujaTransferencia from './components/BurbujaTransferencia';
+import FondoTropical from './components/FondoTropical';
 
 function App() {
   const [vistaActiva, setVistaActiva] = useState('menu');
@@ -23,16 +24,19 @@ function App() {
   const esRuleta = vistaActiva === 'ruleta-premios' || vistaActiva === 'ruleta-consumo';
   const mostrarBarraEnvios = vistaActiva === 'menu' && seccionMenuActiva !== 'botellas';
 
-  // Color de fondo según la vista
-  const fondoVista = esRuleta ? 'bg-arena' : 'bg-bar-dark';
+  // Color de fondo según la vista (transparente para menú, para que se vea el fondo de imagen)
+  const fondoVista = esRuleta ? 'bg-arena' : '';
 
   return (
-    <div className={`min-h-screen ${fondoVista}`}>
+    <div className="min-h-screen">
+      {/* Fondo global */}
+      <FondoTropical />
+      
       {/* Header fijo - altura ~80px */}
       <Header onNavigate={setVistaActiva} />
 
       {/* Contenido principal: padding abajo para nav y, si aplica, barra de envíos */}
-      <main className={`pt-[68px] ${fondoVista} ${mostrarBarraEnvios ? 'pb-32' : 'pb-24'}`}>
+      <main className={`pt-[68px] pb-28 relative z-10 ${fondoVista}`}>
         <AnimatePresence mode="wait">
           {vistaActiva === 'menu' && (
             <motion.div
@@ -87,32 +91,36 @@ function App() {
 
       {!esRuleta && <BurbujaTransferencia abierto={burbujaAbierta} onToggle={setBurbujaAbierta} />}
 
-      {/* Contenedor fijo abajo: barra de envíos + navegación */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 safe-area-bottom">
-        {/* Barra de envíos a domicilio */}
-        {mostrarBarraEnvios && <AnuncioEnvios />}
-
-        {/* Barra de navegación */}
-        <nav className="bg-menu-green-dark border-t border-menu-cream/20 px-2 pt-3 pb-3">
-          <div className="flex justify-around items-center max-w-md mx-auto">
-            {navegacionItems.map((item) => (
-              <motion.button
-                key={item.id}
-                onClick={() => setVistaActiva(item.id)}
-                className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-all ${
-                  vistaActiva === item.id
-                    ? 'bg-menu-cream/20 text-menu-cream'
-                    : 'text-menu-cream/50 hover:text-menu-cream/80'
-                }`}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="text-lg">{item.icono}</span>
-                <span className="text-[10px] font-medium">{item.label}</span>
-              </motion.button>
-            ))}
+      {/* Barra de navegación inferior */}
+      <nav className="fixed bottom-0 left-0 right-0 z-[100]">
+        <div className="bg-menu-green-dark/40 backdrop-blur-xl border-t border-white/10 pb-[env(safe-area-inset-bottom)]">
+          <div className="flex justify-around items-center px-1 py-1">
+            {navegacionItems.map((item) => {
+              const activo = vistaActiva === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setVistaActiva(item.id)}
+                  style={{ touchAction: 'manipulation' }}
+                  className={`flex flex-col items-center justify-center py-3 px-5 rounded-2xl transition-colors duration-150 min-w-[72px] active:scale-95 ${
+                    activo
+                      ? 'bg-menu-cream text-menu-green-dark'
+                      : 'text-menu-cream/70 active:bg-white/20'
+                  }`}
+                >
+                  <span className="text-xl mb-1">
+                    {item.icono}
+                  </span>
+                  <span className={`text-xs font-medium tracking-wide ${activo ? 'font-semibold' : ''}`}>
+                    {item.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-        </nav>
-      </div>
+        </div>
+      </nav>
     </div>
   );
 }

@@ -30,16 +30,15 @@ const Visitar = () => {
           transition={{ delay: 0.2, duration: 0.35 }}
           className="font-body text-white/90 text-lg tracking-wide space-y-2"
         >
-          <p className="flex items-center justify-center gap-2">
-            <a
-              href="https://maps.app.goo.gl/z1Q2YHbbNQjwTpNs8"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors underline underline-offset-2"
-            >
-              <span>📍</span> Miguel Negrete S/N, Tixtla de Guerrero, Gro.
-            </a>
-          </p>
+          <a
+            href="https://maps.app.goo.gl/z1Q2YHbbNQjwTpNs8"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 text-white/90 hover:text-white transition-colors underline underline-offset-4"
+          >
+            <span className="text-xl">📍</span>
+            <span>Miguel Negrete S/N, Tixtla de Guerrero, Gro.</span>
+          </a>
           <p className="text-white/70 text-base mt-4">
             Horarios y más en redes
           </p>
