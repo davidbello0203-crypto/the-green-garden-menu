@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { UtensilsCrossed, Dice5, Gift, MapPin } from 'lucide-react';
 import Header from './components/Header';
-import AnuncioEnvios from './components/AnuncioEnvios';
 import Menu from './components/Menu';
 import RuletaPremios from './components/RuletaPremios';
 import RuletaConsumo from './components/RuletaConsumo';
@@ -15,85 +14,41 @@ function App() {
   const [seccionMenuActiva, setSeccionMenuActiva] = useState('bebidas');
 
   const navegacionItems = [
-    { id: 'menu', label: 'Menú', icono: '📋' },
-    { id: 'ruleta-consumo', label: 'Juegos', icono: '🎲' },
-    { id: 'ruleta-premios', label: 'Premios', icono: '🎁' },
-    { id: 'visitar', label: 'Visitar', icono: '📍' },
+    { id: 'menu', label: 'Menú', Icono: UtensilsCrossed },
+    { id: 'ruleta-consumo', label: 'Juegos', Icono: Dice5 },
+    { id: 'ruleta-premios', label: 'Premios', Icono: Gift },
+    { id: 'visitar', label: 'Visitar', Icono: MapPin },
   ];
 
   const esRuleta = vistaActiva === 'ruleta-premios' || vistaActiva === 'ruleta-consumo';
-  const mostrarBarraEnvios = vistaActiva === 'menu' && seccionMenuActiva !== 'botellas';
-
-  // Color de fondo según la vista (transparente para menú, para que se vea el fondo de imagen)
-  const fondoVista = esRuleta ? 'bg-arena' : '';
 
   return (
     <div className="min-h-screen">
-      {/* Fondo global */}
       <FondoTropical />
-      
-      {/* Header fijo - altura ~80px */}
-      <Header onNavigate={setVistaActiva} />
+      <Header onNavigate={setVistaActiva} esRuleta={esRuleta} />
 
-      {/* Contenido principal: padding abajo para nav y, si aplica, barra de envíos */}
-      <main className={`pt-[68px] pb-28 relative z-10 ${fondoVista}`}>
-        <AnimatePresence mode="wait">
-          {vistaActiva === 'menu' && (
-            <motion.div
-              key="menu"
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 16 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-            >
-              <Menu
-                initialSeccion={seccionMenuActiva}
-                onAbrirTransferencia={() => setBurbujaAbierta(true)}
-                onSeccionChange={setSeccionMenuActiva}
-              />
-            </motion.div>
-          )}
-          {vistaActiva === 'ruleta-premios' && (
-            <motion.div
-              key="ruleta-premios"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-            >
-              <RuletaPremios />
-            </motion.div>
-          )}
-          {vistaActiva === 'ruleta-consumo' && (
-            <motion.div
-              key="ruleta-consumo"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-            >
-              <RuletaConsumo />
-            </motion.div>
-          )}
-          {vistaActiva === 'visitar' && (
-            <motion.div
-              key="visitar"
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -16 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-            >
-              <Visitar />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <main className={`pt-[68px] pb-28 relative z-10 ${esRuleta ? 'bg-arena' : ''}`}>
+        {vistaActiva === 'menu' && (
+          <Menu
+            initialSeccion={seccionMenuActiva}
+            onAbrirTransferencia={() => setBurbujaAbierta(true)}
+            onSeccionChange={setSeccionMenuActiva}
+          />
+        )}
+        {vistaActiva === 'ruleta-premios' && <RuletaPremios />}
+        {vistaActiva === 'ruleta-consumo' && <RuletaConsumo />}
+        {vistaActiva === 'visitar' && <Visitar />}
       </main>
 
-      {!esRuleta && <BurbujaTransferencia abierto={burbujaAbierta} onToggle={setBurbujaAbierta} />}
+      {!esRuleta && (
+        <BurbujaTransferencia abierto={burbujaAbierta} onToggle={setBurbujaAbierta} />
+      )}
 
       {/* Barra de navegación inferior */}
       <nav className="fixed bottom-0 left-0 right-0 z-[100]">
-        <div className="bg-menu-green-dark/40 backdrop-blur-xl border-t border-white/10 pb-[env(safe-area-inset-bottom)]">
+        <div className={`border-t border-menu-cream/20 pb-[env(safe-area-inset-bottom)] ${
+          esRuleta ? 'bg-menu-green' : 'bg-menu-green/55 backdrop-blur-xl'
+        }`}>
           <div className="flex justify-around items-center px-1 py-1">
             {navegacionItems.map((item) => {
               const activo = vistaActiva === item.id;
@@ -102,17 +57,14 @@ function App() {
                   key={item.id}
                   type="button"
                   onClick={() => setVistaActiva(item.id)}
-                  style={{ touchAction: 'manipulation' }}
-                  className={`flex flex-col items-center justify-center py-3 px-5 rounded-2xl transition-colors duration-150 min-w-[72px] active:scale-95 ${
+                  className={`flex flex-col items-center justify-center py-3 px-5 rounded-2xl transition-colors min-w-[72px] active:scale-95 ${
                     activo
                       ? 'bg-menu-cream text-menu-green-dark'
                       : 'text-menu-cream/70 active:bg-white/20'
                   }`}
                 >
-                  <span className="text-xl mb-1">
-                    {item.icono}
-                  </span>
-                  <span className={`text-xs font-medium tracking-wide ${activo ? 'font-semibold' : ''}`}>
+                  <item.Icono size={22} strokeWidth={activo ? 2.5 : 1.8} className="mb-1" />
+                  <span className={`text-xs tracking-wide ${activo ? 'font-semibold' : 'font-medium'}`}>
                     {item.label}
                   </span>
                 </button>
@@ -126,4 +78,3 @@ function App() {
 }
 
 export default App;
-

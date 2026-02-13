@@ -195,7 +195,7 @@ export const seccionesMenu = [
   {
     id: 'bebidas',
     nombre: "Drink's",
-    icono: '🍺',
+    icono: 'Beer',
     // Imagen local: horizontal, estilo tropical (cóctel, madera, limas, luz cálida)
     imagen: '/imagenes/drinks.png',
     categoriaIds: ['cerveza', 'micheladas', 'mezcal', 'cantaritos', 'mojitos', 'cocteles', 'vodka', 'ron', 'ginebra', 'shot'],
@@ -203,21 +203,21 @@ export const seccionesMenu = [
   {
     id: 'comida',
     nombre: 'Comida',
-    icono: '🍔',
+    icono: 'Utensils',
     imagen: '/imagenes/comida.png',
     categoriaIds: ['burguers', 'hotdogs', 'burritos'],
   },
   {
     id: 'snacks',
     nombre: "Snack's",
-    icono: '🍟',
+    icono: 'Fries',
     imagen: '/imagenes/snacks.png',
     categoriaIds: ['snacks', 'salsas-snacks'],
   },
   {
     id: 'botellas',
     nombre: 'Botellas y Copeo',
-    icono: '🍾',
+    icono: 'Wine',
     imagen: '/imagenes/botellas.png',
     categoriaIds: ['botellas'],
   },
