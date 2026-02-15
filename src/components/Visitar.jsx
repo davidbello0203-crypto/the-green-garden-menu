@@ -34,9 +34,16 @@ const Visitar = () => {
             href="https://maps.app.goo.gl/z1Q2YHbbNQjwTpNs8"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 text-white/90 hover:text-white transition-colors underline underline-offset-4"
+            className="inline-flex items-start justify-center gap-2 text-white/90 hover:text-white transition-colors underline underline-offset-4"
           >
-            <span className="text-xl">📍</span>
+            <svg
+              className="w-5 h-5 shrink-0 mt-[3px] text-red-500"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" />
+            </svg>
             <span>Miguel Negrete S/N, Tixtla de Guerrero, Gro.</span>
           </a>
           <p className="text-white/70 text-base mt-4">
