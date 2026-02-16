@@ -22,45 +22,35 @@ const BurbujaTransferencia = ({ abierto: abiertoExterno, onToggle, isDomingo }) 
   const dragStart = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
   const bubbleRef = useRef(null);
 
+  const copiarConFallback = (texto) => {
+    const textArea = document.createElement('textarea');
+    textArea.value = texto;
+    textArea.style.cssText = 'position:fixed;left:-9999px;top:-9999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+  };
+
   const copiarTarjeta = async () => {
     const texto = DATOS_TRANSFERENCIA.numeroTarjeta.replace(/\s/g, '');
-
     try {
-      // Intenta usar la API moderna del clipboard
-      if (navigator.clipboard && navigator.clipboard.writeText) {
+      if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(texto);
       } else {
-        // Fallback para navegadores que no soportan clipboard API
-        const textArea = document.createElement('textarea');
-        textArea.value = texto;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-9999px';
-        textArea.style.top = '-9999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
+        copiarConFallback(texto);
       }
       setCopiadoTarjeta(true);
       setTimeout(() => setCopiadoTarjeta(false), 2500);
-    } catch (err) {
-      // Si falla, intenta el método alternativo
-      const textArea = document.createElement('textarea');
-      textArea.value = texto;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-9999px';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
+    } catch {
       try {
-        document.execCommand('copy');
+        copiarConFallback(texto);
         setCopiadoTarjeta(true);
         setTimeout(() => setCopiadoTarjeta(false), 2500);
       } catch (e) {
         console.error('Error al copiar:', e);
       }
-      document.body.removeChild(textArea);
     }
   };
 

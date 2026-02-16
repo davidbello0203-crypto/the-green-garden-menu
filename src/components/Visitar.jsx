@@ -66,11 +66,11 @@ const Visitar = ({ isDomingo }) => {
           </a>
           {isDomingo ? (
             <div className="mt-5 space-y-2">
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border ${isDomingo ? 'border-amber-400/30 bg-amber-900/40' : ''}`}>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-amber-400/30 bg-amber-900/40">
                 <span className="text-lg">📅</span>
                 <span className={`text-sm font-semibold ${textPrimary}`}>Solo Domingos</span>
               </div>
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border ${isDomingo ? 'border-amber-400/30 bg-amber-900/40' : ''}`}>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-amber-400/30 bg-amber-900/40">
                 <span className="text-lg">🕗</span>
                 <span className={`text-sm font-semibold ${textPrimary}`}>8:00 AM — 3:00 PM</span>
               </div>

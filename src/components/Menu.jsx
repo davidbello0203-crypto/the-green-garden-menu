@@ -319,6 +319,7 @@ const Menu = ({ onAbrirTransferencia, onSeccionChange, initialSeccion, onMenuCha
                 </button>
               );
             }
+            const Ico = iconoMap[sec.icono];
             return (
               <button
                 type="button"
@@ -331,7 +332,8 @@ const Menu = ({ onAbrirTransferencia, onSeccionChange, initialSeccion, onMenuCha
                     : 'bg-menu-cream/90 text-menu-green-dark'
                 }`}
               >
-                {(() => { const Ico = iconoMap[sec.icono]; return Ico ? <Ico size={20} strokeWidth={activa ? 2.5 : 1.8} className="inline-block mr-1.5 -mt-0.5" /> : null; })()}{sec.nombre}
+                {Ico && <Ico size={20} strokeWidth={activa ? 2.5 : 1.8} className="inline-block mr-1.5 -mt-0.5" />}
+                {sec.nombre}
               </button>
             );
           })}

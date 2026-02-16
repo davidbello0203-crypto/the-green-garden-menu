@@ -34,24 +34,4 @@
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
-
-  /* Transición suave entre modos */
-  .mode-fade-enter {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-  .mode-fade-enter-active {
-    opacity: 1;
-    transform: scale(1);
-    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-  }
-  .mode-fade-exit {
-    opacity: 1;
-    transform: scale(1);
-  }
-  .mode-fade-exit-active {
-    opacity: 0;
-    transform: scale(0.98);
-    transition: opacity 0.2s ease-in, transform 0.2s ease-in;
-  }
 }

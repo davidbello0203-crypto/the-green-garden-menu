@@ -2,76 +2,10 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { opcionesRuletaConsumo } from '../data/menu';
 import { playSpinStart, playSpinEnd, playSpinLoop } from '../utils/ruletaSound';
-
-// Paletas de colores
-const TEMA_GREEN = {
-  bgPage: 'bg-arena',
-  segmento1: '#1F4B3F',
-  segmento2: '#3E6B5A',
-  linea: '#BFD8B8',
-  textoSvg: '#E6DAC6',
-  flecha: '#1E2F2A',
-  gradiente: 'linear-gradient(135deg, #7FB77E 0%, #3E6B5A 50%, #1F4B3F 100%)',
-  bordeInterior: 'bg-beige',
-  spinBg: '#1F4B3F',
-  spinHover: '#3E6B5A',
-  spinBorde: '#7FB77E',
-  spinSombra: 'rgba(31, 75, 63, 0.5)',
-  spinTexto: 'text-beige',
-  resultadoBg: '#1F4B3F',
-  resultadoBorde: '#7FB77E',
-  resultadoTexto: 'text-beige',
-  resultadoTexto2: 'text-lima',
-  reiniciarBg: '#E6DAC6',
-  reiniciarTexto: '#1F4B3F',
-  reiniciarBorde: '#7FB77E',
-  reiniciarHover: '#BFD8B8',
-  titulo: 'text-verde-negro',
-  tituloSub: 'text-verde-negro/70',
-  panel: 'bg-beige',
-  panelBorde: 'border-hoja/30',
-  panelTitulo: 'text-bosque',
-  panelTexto: 'text-verde-negro',
-  numeroBg: (i) => i % 2 === 0 ? '#1F4B3F' : '#3E6B5A',
-  numeroTexto: 'text-beige',
-  legendaItem: 'bg-arena/50',
-};
-
-const TEMA_DOMINGO = {
-  bgPage: 'bg-amber-950',
-  segmento1: '#78350f',
-  segmento2: '#92400e',
-  linea: '#fbbf24',
-  textoSvg: '#fef3c7',
-  flecha: '#451a03',
-  gradiente: 'linear-gradient(135deg, #f59e0b 0%, #b45309 50%, #78350f 100%)',
-  bordeInterior: 'bg-amber-100',
-  spinBg: '#78350f',
-  spinHover: '#92400e',
-  spinBorde: '#f59e0b',
-  spinSombra: 'rgba(120, 53, 15, 0.5)',
-  spinTexto: 'text-amber-100',
-  resultadoBg: '#78350f',
-  resultadoBorde: '#f59e0b',
-  resultadoTexto: 'text-amber-100',
-  resultadoTexto2: 'text-amber-300',
-  reiniciarBg: '#fef3c7',
-  reiniciarTexto: '#78350f',
-  reiniciarBorde: '#f59e0b',
-  reiniciarHover: '#fde68a',
-  titulo: 'text-amber-100',
-  tituloSub: 'text-amber-200/70',
-  panel: 'bg-amber-900/60',
-  panelBorde: 'border-amber-400/30',
-  panelTitulo: 'text-amber-200',
-  panelTexto: 'text-amber-100',
-  numeroBg: (i) => i % 2 === 0 ? '#78350f' : '#92400e',
-  numeroTexto: 'text-amber-100',
-  legendaItem: 'bg-amber-800/40',
-};
+import { TEMA_CONSUMO_GREEN, TEMA_CONSUMO_DOMINGO } from '../utils/temas';
 
 const RuletaConsumo = ({ isDomingo }) => {
-  const t = isDomingo ? TEMA_DOMINGO : TEMA_GREEN;
+  const t = isDomingo ? TEMA_CONSUMO_DOMINGO : TEMA_CONSUMO_GREEN;
 
   const [girando, setGirando] = useState(false);
   const [decision, setDecision] = useState(null);
@@ -208,7 +142,7 @@ const RuletaConsumo = ({ isDomingo }) => {
                 disabled={girando}
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 z-20"
                 style={{
-                  backgroundColor: girando ? (isDomingo ? '#a16207' : '#6B8E7D') : t.spinBg,
+                  backgroundColor: girando ? t.spinDisabled : t.spinBg,
                   border: `4px solid ${t.spinBorde}`,
                   boxShadow: `0 6px 20px ${t.spinSombra}, inset 0 2px 4px rgba(255,255,255,0.1)`,
                   cursor: girando ? 'not-allowed' : 'pointer',
