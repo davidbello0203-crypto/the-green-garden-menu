@@ -254,7 +254,7 @@ const BurbujaTransferencia = ({ abierto: abiertoExterno, onToggle, isDomingo }) 
               : 'bg-menu-cream text-menu-green-dark border-menu-green-dark/30 hover:bg-menu-cream-light'
           } ${isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab'}`}
           style={{
-            animation: abierto || isDragging ? 'none' : 'pulse-slow 2.5s ease-in-out infinite',
+            animation: abierto || isDragging ? 'none' : 'heartbeat 1.8s ease-in-out infinite',
           }}
           aria-label="Ver datos de transferencia"
         >

@@ -310,8 +310,8 @@ const Menu = ({ onAbrirTransferencia, onSeccionChange, initialSeccion, onMenuCha
                   onClick={() => setSeccionActiva(sec.id)}
                   className={`px-6 py-3.5 rounded-xl whitespace-nowrap font-slab font-semibold text-lg transition-colors shrink-0 active:scale-95 ${
                     activa
-                      ? 'bg-amber-900/90 text-amber-100 shadow-md border border-amber-300/30'
-                      : 'bg-amber-200/90 text-amber-900'
+                      ? 'bg-amber-200/90 text-amber-900 shadow-md border border-amber-400/40'
+                      : 'bg-amber-900/90 text-amber-100 border border-amber-300/20'
                   }`}
                 >
                   <span className="mr-1.5">{sec.icono}</span>
