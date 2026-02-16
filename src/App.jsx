@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { UtensilsCrossed, Dice5, Gift, MapPin } from 'lucide-react';
 import Header from './components/Header';
 import Menu from './components/Menu';
@@ -12,6 +12,14 @@ function App() {
   const [vistaActiva, setVistaActiva] = useState('menu');
   const [burbujaAbierta, setBurbujaAbierta] = useState(false);
   const [seccionMenuActiva, setSeccionMenuActiva] = useState('bebidas');
+  // Auto-detectar si es domingo por la mañana (antes de las 3pm)
+  const modoInicial = useMemo(() => {
+    const ahora = new Date();
+    const esDomingo = ahora.getDay() === 0;
+    const esManana = ahora.getHours() < 15;
+    return (esDomingo && esManana) ? 'domingo' : 'green';
+  }, []);
+  const [menuActivo, setMenuActivo] = useState(modoInicial);
 
   const navegacionItems = [
     { id: 'menu', label: 'Menú', Icono: UtensilsCrossed },
@@ -21,33 +29,40 @@ function App() {
   ];
 
   const esRuleta = vistaActiva === 'ruleta-premios' || vistaActiva === 'ruleta-consumo';
+  const isDomingo = menuActivo === 'domingo';
 
   return (
     <div className="min-h-screen">
-      <FondoTropical />
-      <Header onNavigate={setVistaActiva} esRuleta={esRuleta} />
+      {!isDomingo && <FondoTropical />}
+      <Header onNavigate={setVistaActiva} esRuleta={esRuleta} isDomingo={isDomingo} />
 
-      <main className={`pt-[68px] pb-28 relative z-10 ${esRuleta ? 'bg-arena' : ''}`}>
+      <main className={`pt-[68px] pb-28 relative z-10 ${esRuleta ? (isDomingo ? 'bg-amber-950' : 'bg-arena') : ''}`}>
         {vistaActiva === 'menu' && (
           <Menu
             initialSeccion={seccionMenuActiva}
             onAbrirTransferencia={() => setBurbujaAbierta(true)}
             onSeccionChange={setSeccionMenuActiva}
+            onMenuChange={setMenuActivo}
+            menuActivo={menuActivo}
           />
         )}
-        {vistaActiva === 'ruleta-premios' && <RuletaPremios />}
-        {vistaActiva === 'ruleta-consumo' && <RuletaConsumo />}
-        {vistaActiva === 'visitar' && <Visitar />}
+        {vistaActiva === 'ruleta-premios' && <RuletaPremios isDomingo={isDomingo} />}
+        {vistaActiva === 'ruleta-consumo' && <RuletaConsumo isDomingo={isDomingo} />}
+        {vistaActiva === 'visitar' && <Visitar isDomingo={isDomingo} />}
       </main>
 
       {!esRuleta && (
-        <BurbujaTransferencia abierto={burbujaAbierta} onToggle={setBurbujaAbierta} />
+        <BurbujaTransferencia abierto={burbujaAbierta} onToggle={setBurbujaAbierta} isDomingo={isDomingo} />
       )}
 
       {/* Barra de navegación inferior */}
       <nav className="fixed bottom-0 left-0 right-0 z-[100]">
-        <div className={`border-t border-menu-cream/20 pb-[env(safe-area-inset-bottom)] ${
-          esRuleta ? 'bg-menu-green' : 'bg-menu-green/55 backdrop-blur-xl'
+        <div className={`border-t pb-[env(safe-area-inset-bottom)] transition-colors duration-300 ${
+          isDomingo
+            ? 'border-amber-300/20 bg-amber-950/80 backdrop-blur-xl'
+            : esRuleta
+              ? 'border-menu-cream/20 bg-menu-green'
+              : 'border-menu-cream/20 bg-menu-green/55 backdrop-blur-xl'
         }`}>
           <div className="flex justify-around items-center px-1 py-1">
             {navegacionItems.map((item) => {
@@ -57,10 +72,14 @@ function App() {
                   key={item.id}
                   type="button"
                   onClick={() => setVistaActiva(item.id)}
-                  className={`flex flex-col items-center justify-center py-3 px-5 rounded-2xl transition-colors min-w-[72px] active:scale-95 ${
+                  className={`flex flex-col items-center justify-center py-3 px-5 rounded-2xl transition-all duration-300 min-w-[72px] active:scale-95 ${
                     activo
-                      ? 'bg-menu-cream text-menu-green-dark'
-                      : 'text-menu-cream/70 active:bg-white/20'
+                      ? isDomingo
+                        ? 'bg-amber-200 text-amber-900'
+                        : 'bg-menu-cream text-menu-green-dark'
+                      : isDomingo
+                        ? 'text-amber-200/70 active:bg-amber-300/20'
+                        : 'text-menu-cream/70 active:bg-white/20'
                   }`}
                 >
                   <item.Icono size={22} strokeWidth={activo ? 2.5 : 1.8} className="mb-1" />

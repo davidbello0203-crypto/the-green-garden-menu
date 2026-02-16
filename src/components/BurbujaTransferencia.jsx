@@ -7,7 +7,7 @@ const DATOS_TRANSFERENCIA = {
   titular: 'Carlos Sinai Martinez',
 };
 
-const BurbujaTransferencia = ({ abierto: abiertoExterno, onToggle }) => {
+const BurbujaTransferencia = ({ abierto: abiertoExterno, onToggle, isDomingo }) => {
   const [abiertoInterno, setAbiertoInterno] = useState(false);
   const esControlado = abiertoExterno !== undefined && typeof onToggle === 'function';
   const abierto = esControlado ? abiertoExterno : abiertoInterno;
@@ -180,29 +180,39 @@ const BurbujaTransferencia = ({ abierto: abiertoExterno, onToggle }) => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.2 }}
-              className="fixed z-[60] w-80 max-w-[calc(100vw-2rem)] rounded-2xl border-2 border-menu-cream/30 bg-menu-green-dark shadow-2xl overflow-hidden inset-0 m-auto h-fit"
+              className={`fixed z-[60] w-80 max-w-[calc(100vw-2rem)] rounded-2xl border-2 shadow-2xl overflow-hidden inset-0 m-auto h-fit transition-colors duration-300 ${
+                isDomingo
+                  ? 'border-amber-300/30 bg-amber-950'
+                  : 'border-menu-cream/30 bg-menu-green-dark'
+              }`}
               onClick={(e) => e.stopPropagation()}
             >
-            <div className="px-5 py-4 bg-menu-green-bar border-b border-menu-cream/20">
-              <h3 className="font-slab font-bold text-menu-cream text-base uppercase tracking-wide">
+            <div className={`px-5 py-4 border-b transition-colors duration-300 ${
+              isDomingo
+                ? 'bg-amber-900 border-amber-300/20'
+                : 'bg-menu-green-bar border-menu-cream/20'
+            }`}>
+              <h3 className={`font-slab font-bold text-base uppercase tracking-wide ${isDomingo ? 'text-amber-100' : 'text-menu-cream'}`}>
                 Datos de transferencia
               </h3>
             </div>
             <div className="p-5 space-y-4 text-base font-body">
               <div>
-                <p className="text-menu-cream/60 text-sm uppercase tracking-wider">Banco</p>
-                <p className="text-menu-cream font-medium">{DATOS_TRANSFERENCIA.banco}</p>
+                <p className={`text-sm uppercase tracking-wider ${isDomingo ? 'text-amber-200/60' : 'text-menu-cream/60'}`}>Banco</p>
+                <p className={`font-medium ${isDomingo ? 'text-amber-100' : 'text-menu-cream'}`}>{DATOS_TRANSFERENCIA.banco}</p>
               </div>
               <div>
-                <p className="text-menu-cream/60 text-sm uppercase tracking-wider">Número de tarjeta</p>
-                <p className="text-menu-cream font-mono text-lg tracking-wider">{DATOS_TRANSFERENCIA.numeroTarjeta}</p>
+                <p className={`text-sm uppercase tracking-wider ${isDomingo ? 'text-amber-200/60' : 'text-menu-cream/60'}`}>Número de tarjeta</p>
+                <p className={`font-mono text-lg tracking-wider ${isDomingo ? 'text-amber-100' : 'text-menu-cream'}`}>{DATOS_TRANSFERENCIA.numeroTarjeta}</p>
                 <button
                   type="button"
                   onClick={copiarTarjeta}
                   className={`mt-2 w-full py-2.5 rounded-lg font-semibold text-sm transition-all ${
                     copiadoTarjeta
                       ? 'bg-green-500 text-white'
-                      : 'bg-menu-cream text-menu-green-dark hover:bg-menu-cream-light'
+                      : isDomingo
+                        ? 'bg-amber-200 text-amber-900 hover:bg-amber-300'
+                        : 'bg-menu-cream text-menu-green-dark hover:bg-menu-cream-light'
                   }`}
                 >
                   {copiadoTarjeta ? (
@@ -218,8 +228,8 @@ const BurbujaTransferencia = ({ abierto: abiertoExterno, onToggle }) => {
                 </button>
               </div>
               <div>
-                <p className="text-menu-cream/60 text-sm uppercase tracking-wider">Titular</p>
-                <p className="text-menu-cream font-medium">{DATOS_TRANSFERENCIA.titular}</p>
+                <p className={`text-sm uppercase tracking-wider ${isDomingo ? 'text-amber-200/60' : 'text-menu-cream/60'}`}>Titular</p>
+                <p className={`font-medium ${isDomingo ? 'text-amber-100' : 'text-menu-cream'}`}>{DATOS_TRANSFERENCIA.titular}</p>
               </div>
             </div>
           </motion.div>
@@ -248,7 +258,11 @@ const BurbujaTransferencia = ({ abierto: abiertoExterno, onToggle }) => {
           }}
           onMouseDown={handleDragStart}
           onTouchStart={handleDragStart}
-          className={`flex items-center justify-center w-16 h-16 rounded-full bg-menu-cream text-menu-green-dark shadow-lg border-2 border-menu-green-dark/30 hover:bg-menu-cream-light active:scale-95 transition-colors select-none touch-none ${isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab'}`}
+          className={`flex items-center justify-center w-16 h-16 rounded-full shadow-lg border-2 active:scale-95 transition-all duration-300 select-none touch-none ${
+            isDomingo
+              ? 'bg-amber-200 text-amber-900 border-amber-400/50 hover:bg-amber-300'
+              : 'bg-menu-cream text-menu-green-dark border-menu-green-dark/30 hover:bg-menu-cream-light'
+          } ${isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab'}`}
           style={{
             animation: abierto || isDragging ? 'none' : 'pulse-slow 2.5s ease-in-out infinite',
           }}

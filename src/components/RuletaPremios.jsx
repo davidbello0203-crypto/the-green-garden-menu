@@ -3,11 +3,92 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { premiosRuletaBienvenida } from '../data/menu';
 import { playSpinStart, playSpinEnd, playSpinLoop } from '../utils/ruletaSound';
 
-/**
- * Ruleta de Bienvenida - Diseño elegante con paleta natural
- * Colores: Verde bosque, oliva, hoja, lima, arena, beige
- */
-const RuletaPremios = () => {
+// Paletas de colores
+const TEMA_GREEN = {
+  bgPage: 'bg-arena',
+  segmento1: '#1F4B3F',
+  segmento2: '#3E6B5A',
+  linea: '#BFD8B8',
+  textoSvg: '#E6DAC6',
+  flecha: '#1E2F2A',
+  gradiente: 'linear-gradient(135deg, #7FB77E 0%, #3E6B5A 50%, #1F4B3F 100%)',
+  bordeInterior: 'bg-beige',
+  spinBg: '#1F4B3F',
+  spinHover: '#3E6B5A',
+  spinDisabled: '#6B8E7D',
+  spinBorde: '#7FB77E',
+  spinSombra: 'rgba(31, 75, 63, 0.5)',
+  spinTexto: 'text-beige',
+  resultadoBg: '#1F4B3F',
+  resultadoBorde: '#7FB77E',
+  resultadoTexto: 'text-beige',
+  resultadoTexto2: 'text-lima',
+  resultadoSubtexto: 'text-beige/70',
+  titulo: 'text-verde-negro',
+  tituloSub: 'text-verde-negro/70',
+  panel: 'bg-beige',
+  panelBorde: 'border-hoja/30',
+  panelTitulo: 'text-bosque',
+  panelTexto: 'text-verde-negro',
+  numeroBg: (i) => i % 2 === 0 ? '#1F4B3F' : '#3E6B5A',
+  numeroTexto: 'text-beige',
+  legendaItem: 'bg-arena/50',
+  usadoTexto: 'text-verde-negro/60',
+  usadoSub: 'text-verde-negro/40',
+  terminosTexto: 'text-verde-negro/50',
+  terminosHover: 'hover:text-verde-negro/70',
+  modalBg: 'bg-beige',
+  modalBorde: 'border-hoja/30',
+  modalTitulo: 'text-bosque',
+  modalTexto: 'text-verde-negro/80',
+  modalBullet: 'text-bosque',
+  modalBtn: 'bg-bosque text-beige hover:bg-bosque/90',
+};
+
+const TEMA_DOMINGO = {
+  bgPage: 'bg-amber-950',
+  segmento1: '#78350f',
+  segmento2: '#92400e',
+  linea: '#fbbf24',
+  textoSvg: '#fef3c7',
+  flecha: '#451a03',
+  gradiente: 'linear-gradient(135deg, #f59e0b 0%, #b45309 50%, #78350f 100%)',
+  bordeInterior: 'bg-amber-100',
+  spinBg: '#78350f',
+  spinHover: '#92400e',
+  spinDisabled: '#a16207',
+  spinBorde: '#f59e0b',
+  spinSombra: 'rgba(120, 53, 15, 0.5)',
+  spinTexto: 'text-amber-100',
+  resultadoBg: '#78350f',
+  resultadoBorde: '#f59e0b',
+  resultadoTexto: 'text-amber-100',
+  resultadoTexto2: 'text-amber-300',
+  resultadoSubtexto: 'text-amber-100/70',
+  titulo: 'text-amber-100',
+  tituloSub: 'text-amber-200/70',
+  panel: 'bg-amber-900/60',
+  panelBorde: 'border-amber-400/30',
+  panelTitulo: 'text-amber-200',
+  panelTexto: 'text-amber-100',
+  numeroBg: (i) => i % 2 === 0 ? '#78350f' : '#92400e',
+  numeroTexto: 'text-amber-100',
+  legendaItem: 'bg-amber-800/40',
+  usadoTexto: 'text-amber-200/60',
+  usadoSub: 'text-amber-300/40',
+  terminosTexto: 'text-amber-300/50',
+  terminosHover: 'hover:text-amber-200/70',
+  modalBg: 'bg-amber-900',
+  modalBorde: 'border-amber-400/30',
+  modalTitulo: 'text-amber-200',
+  modalTexto: 'text-amber-100/80',
+  modalBullet: 'text-amber-400',
+  modalBtn: 'bg-amber-700 text-amber-100 hover:bg-amber-600',
+};
+
+const RuletaPremios = ({ isDomingo }) => {
+  const t = isDomingo ? TEMA_DOMINGO : TEMA_GREEN;
+
   const [girando, setGirando] = useState(false);
   const [premioGanado, setPremioGanado] = useState(null);
   const [yaGiro, setYaGiro] = useState(false);
@@ -15,32 +96,24 @@ const RuletaPremios = () => {
   const [tiempoRestante, setTiempoRestante] = useState('');
   const [mostrarTerminos, setMostrarTerminos] = useState(false);
 
-  const DOCE_HORAS_MS = 12 * 60 * 60 * 1000; // 12 horas en milisegundos
+  const DOCE_HORAS_MS = 12 * 60 * 60 * 1000;
 
-  // Calcular tiempo restante hasta poder girar de nuevo
   const calcularTiempoRestante = (timestampUltimoGiro) => {
     const ahora = Date.now();
     const proximoGiro = timestampUltimoGiro + DOCE_HORAS_MS;
     const diff = proximoGiro - ahora;
-
     if (diff <= 0) return '00:00:00';
-
     const horas = Math.floor(diff / (1000 * 60 * 60));
     const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const segundos = Math.floor((diff % (1000 * 60)) / 1000);
-
     return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
   };
 
-  // Verificar si ya giró en las últimas 12 horas
   useEffect(() => {
     const timestampGuardado = localStorage.getItem('ruletaBienvenidaTimestamp');
     const ahora = Date.now();
-
     if (timestampGuardado) {
       const tiempoPasado = ahora - parseInt(timestampGuardado);
-
-      // Si pasaron más de 12 horas, resetear
       if (tiempoPasado >= DOCE_HORAS_MS) {
         localStorage.removeItem('ruletaBienvenidaGiro');
         localStorage.removeItem('ruletaBienvenidaPremio');
@@ -48,30 +121,22 @@ const RuletaPremios = () => {
         setYaGiro(false);
         setPremioGanado(null);
       } else {
-        // Aún no pasan 12 horas
         const yaGiroRuleta = localStorage.getItem('ruletaBienvenidaGiro');
         if (yaGiroRuleta === 'true') {
           setYaGiro(true);
           const premioGuardado = localStorage.getItem('ruletaBienvenidaPremio');
-          if (premioGuardado) {
-            setPremioGanado(JSON.parse(premioGuardado));
-          }
+          if (premioGuardado) setPremioGanado(JSON.parse(premioGuardado));
         }
       }
     }
   }, []);
 
-  // Actualizar contador cada segundo cuando ya giró
   useEffect(() => {
     if (!yaGiro) return;
-
     const timestampGuardado = parseInt(localStorage.getItem('ruletaBienvenidaTimestamp') || '0');
-
     const actualizar = () => {
       const tiempo = calcularTiempoRestante(timestampGuardado);
       setTiempoRestante(tiempo);
-
-      // Si llegó a 0, resetear automáticamente
       if (tiempo === '00:00:00') {
         localStorage.removeItem('ruletaBienvenidaGiro');
         localStorage.removeItem('ruletaBienvenidaPremio');
@@ -80,10 +145,8 @@ const RuletaPremios = () => {
         setPremioGanado(null);
       }
     };
-
     actualizar();
     const intervalo = setInterval(actualizar, 1000);
-
     return () => clearInterval(intervalo);
   }, [yaGiro]);
 
@@ -91,30 +154,17 @@ const RuletaPremios = () => {
     if (yaGiro || girando) return;
     setGirando(true);
     setPremioGanado(null);
-
-    // Calcular premio aleatorio
     const indicePremio = Math.floor(Math.random() * premiosRuletaBienvenida.length);
     const premioAleatorio = premiosRuletaBienvenida[indicePremio];
-
-    // Calcular rotación para que el segmento quede bajo la flecha (arriba = 0°)
     const anguloSegmento = 360 / premiosRuletaBienvenida.length;
     const centroSegmento = indicePremio * anguloSegmento + anguloSegmento / 2;
-
-    // Posición visual actual del centro del segmento (considerando rotación acumulada)
     const posicionActual = (centroSegmento + (rotacionActual % 360) + 360) % 360;
-
-    // Cuánto rotar para llevar ese segmento a 0° (donde está la flecha)
     const ajuste = (360 - posicionActual) % 360;
-
-    // Vueltas completas (6-9) + ajuste final
     const vueltas = Math.floor(6 + Math.random() * 3);
     const rotacionTotal = rotacionActual + (vueltas * 360) + ajuste;
-
     playSpinStart();
     const stopSpinSound = playSpinLoop({ durationMs: 4500, totalRotationDeg: rotacionTotal });
     setRotacionActual(rotacionTotal);
-
-    // Duración exacta igual a la animación (4.5 segundos)
     setTimeout(() => {
       stopSpinSound();
       playSpinEnd();
@@ -127,55 +177,49 @@ const RuletaPremios = () => {
     }, 4500);
   };
 
-  // Configuración de la ruleta
   const numSegmentos = premiosRuletaBienvenida.length;
   const anguloSegmento = 360 / numSegmentos;
   const tamanoRuleta = 280;
   const radioTexto = tamanoRuleta * 0.38;
 
-  // Colores alternados para segmentos (bosque y oliva)
-  const colorSegmento = (i) => i % 2 === 0 ? '#1F4B3F' : '#3E6B5A';
-
   return (
-    <div className="min-h-[calc(100vh-68px)] bg-arena flex flex-col items-center justify-start px-4 pt-6 pb-8">
+    <div className={`min-h-[calc(100vh-68px)] ${t.bgPage} flex flex-col items-center justify-start px-4 pt-6 pb-8 transition-colors duration-300`}>
 
-      {/* Título elegante */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="text-center mb-6"
       >
-        <h1 className="text-2xl md:text-3xl font-bold text-verde-negro tracking-wide" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+        <h1 className={`text-2xl md:text-3xl font-bold tracking-wide ${t.titulo}`} style={{ fontFamily: 'Montserrat, sans-serif' }}>
           Ruleta de Bienvenida
         </h1>
-        <p className="text-verde-negro/70 text-sm mt-1">Gira y obtén un premio especial</p>
+        <p className={`text-sm mt-1 ${t.tituloSub}`}>Gira y obtén un premio especial</p>
       </motion.div>
 
-      {/* Contenedor principal */}
       <div className="flex flex-col lg:flex-row items-center justify-center gap-8 w-full max-w-4xl">
 
-        {/* Panel de premios - Desktop izquierda */}
+        {/* Panel de premios - Desktop */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="hidden lg:block bg-beige rounded-xl p-5 shadow-lg border-2 border-hoja/30"
+          className={`hidden lg:block rounded-xl p-5 shadow-lg border-2 ${t.panel} ${t.panelBorde}`}
           style={{ minWidth: '200px' }}
         >
-          <h3 className="text-bosque font-bold text-sm uppercase tracking-wider mb-4 text-center border-b border-hoja/30 pb-2">
+          <h3 className={`font-bold text-sm uppercase tracking-wider mb-4 text-center border-b pb-2 ${t.panelTitulo} ${t.panelBorde}`}>
             Premios
           </h3>
           <div className="space-y-3">
             {premiosRuletaBienvenida.map((premio, i) => (
               <div key={premio.id} className="flex items-center gap-3">
                 <span
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-beige text-base font-bold shadow-md"
-                  style={{ backgroundColor: colorSegmento(i) }}
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center ${t.numeroTexto} text-base font-bold shadow-md`}
+                  style={{ backgroundColor: t.numeroBg(i) }}
                 >
                   {i + 1}
                 </span>
-                <span className="text-verde-negro text-base font-medium">{premio.corto}</span>
+                <span className={`text-base font-medium ${t.panelTexto}`}>{premio.corto}</span>
               </div>
             ))}
           </div>
@@ -189,66 +233,39 @@ const RuletaPremios = () => {
           className="relative"
           style={{ width: tamanoRuleta + 40, height: tamanoRuleta + 40 }}
         >
-          {/* Flecha indicadora (arriba) */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-30">
             <div
               className="w-0 h-0 border-l-[14px] border-r-[14px] border-t-[28px] border-l-transparent border-r-transparent"
-              style={{
-                borderTopColor: '#1E2F2A',
-                filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))'
-              }}
+              style={{ borderTopColor: t.flecha, filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))' }}
             />
           </div>
 
-          {/* Marco exterior decorativo */}
           <div
             className="absolute inset-0 rounded-full shadow-2xl"
-            style={{
-              background: 'linear-gradient(135deg, #7FB77E 0%, #3E6B5A 50%, #1F4B3F 100%)',
-              padding: '8px'
-            }}
+            style={{ background: t.gradiente, padding: '8px' }}
           >
-            {/* Borde interior beige */}
-            <div className="w-full h-full rounded-full bg-beige p-2">
-
-              {/* Ruleta giratoria */}
+            <div className={`w-full h-full rounded-full ${t.bordeInterior} p-2`}>
               <motion.div
                 className="w-full h-full rounded-full overflow-hidden relative"
                 animate={{ rotate: rotacionActual }}
-                transition={{
-                  duration: girando ? 4.5 : 0,
-                  ease: [0.2, 0.8, 0.3, 1], // Curva de desaceleración realista
-                }}
+                transition={{ duration: girando ? 4.5 : 0, ease: [0.2, 0.8, 0.3, 1] }}
                 style={{
                   background: `conic-gradient(${premiosRuletaBienvenida.map((_, i) => {
-                    const color = colorSegmento(i);
+                    const color = t.numeroBg(i);
                     return `${color} ${i * anguloSegmento}deg ${(i + 1) * anguloSegmento}deg`;
                   }).join(', ')})`,
                 }}
               >
-                {/* Líneas divisorias entre segmentos */}
                 <svg className="absolute inset-0 w-full h-full" viewBox={`0 0 ${tamanoRuleta} ${tamanoRuleta}`}>
                   {premiosRuletaBienvenida.map((_, i) => {
                     const angulo = i * anguloSegmento;
                     const rad = (angulo - 90) * (Math.PI / 180);
                     const x2 = tamanoRuleta / 2 + Math.cos(rad) * (tamanoRuleta / 2);
                     const y2 = tamanoRuleta / 2 + Math.sin(rad) * (tamanoRuleta / 2);
-                    return (
-                      <line
-                        key={i}
-                        x1={tamanoRuleta / 2}
-                        y1={tamanoRuleta / 2}
-                        x2={x2}
-                        y2={y2}
-                        stroke="#BFD8B8"
-                        strokeWidth="2"
-                        opacity="0.5"
-                      />
-                    );
+                    return <line key={i} x1={tamanoRuleta / 2} y1={tamanoRuleta / 2} x2={x2} y2={y2} stroke={t.linea} strokeWidth="2" opacity="0.5" />;
                   })}
                 </svg>
 
-                {/* Números en cada segmento */}
                 <svg className="absolute inset-0 w-full h-full" viewBox={`0 0 ${tamanoRuleta} ${tamanoRuleta}`}>
                   {premiosRuletaBienvenida.map((_, index) => {
                     const angulo = index * anguloSegmento + anguloSegmento / 2 - 90;
@@ -256,18 +273,9 @@ const RuletaPremios = () => {
                     const cx = tamanoRuleta / 2 + Math.cos(rad) * radioTexto;
                     const cy = tamanoRuleta / 2 + Math.sin(rad) * radioTexto;
                     return (
-                      <text
-                        key={index}
-                        x={cx}
-                        y={cy}
-                        textAnchor="middle"
-                        dominantBaseline="central"
-                        fill="#E6DAC6"
-                        fontSize="36"
-                        fontWeight="800"
-                        fontFamily="Montserrat, sans-serif"
-                        style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.4)' }}
-                      >
+                      <text key={index} x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
+                        fill={t.textoSvg} fontSize="36" fontWeight="800" fontFamily="Montserrat, sans-serif"
+                        style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.4)' }}>
                         {index + 1}
                       </text>
                     );
@@ -275,28 +283,20 @@ const RuletaPremios = () => {
                 </svg>
               </motion.div>
 
-              {/* Botón central SPIN */}
               <button
                 onClick={girarRuleta}
                 disabled={yaGiro || girando}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 z-20"
+                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 z-20`}
                 style={{
-                  backgroundColor: yaGiro || girando ? '#6B8E7D' : '#1F4B3F',
-                  border: '4px solid #7FB77E',
-                  boxShadow: '0 6px 20px rgba(31, 75, 63, 0.5), inset 0 2px 4px rgba(255,255,255,0.1)',
+                  backgroundColor: yaGiro || girando ? t.spinDisabled : t.spinBg,
+                  border: `4px solid ${t.spinBorde}`,
+                  boxShadow: `0 6px 20px ${t.spinSombra}, inset 0 2px 4px rgba(255,255,255,0.1)`,
                   cursor: yaGiro || girando ? 'not-allowed' : 'pointer',
                 }}
-                onMouseEnter={(e) => {
-                  if (!yaGiro && !girando) e.target.style.backgroundColor = '#3E6B5A';
-                }}
-                onMouseLeave={(e) => {
-                  if (!yaGiro && !girando) e.target.style.backgroundColor = '#1F4B3F';
-                }}
+                onMouseEnter={(e) => { if (!yaGiro && !girando) e.target.style.backgroundColor = t.spinHover; }}
+                onMouseLeave={(e) => { if (!yaGiro && !girando) e.target.style.backgroundColor = t.spinBg; }}
               >
-                <span
-                  className="text-beige font-bold text-lg tracking-wider"
-                  style={{ fontFamily: 'Montserrat, sans-serif' }}
-                >
+                <span className={`${t.spinTexto} font-bold text-lg tracking-wider`} style={{ fontFamily: 'Montserrat, sans-serif' }}>
                   {girando ? '...' : 'SPIN'}
                 </span>
               </button>
@@ -304,42 +304,25 @@ const RuletaPremios = () => {
           </div>
         </motion.div>
 
-        {/* Panel vacío para balance - Desktop derecha */}
         <div className="hidden lg:block" style={{ minWidth: '200px' }} />
       </div>
 
-      {/* Área de resultado - entre ruleta y opciones */}
+      {/* Resultado */}
       <div className="mt-4 w-full max-w-sm">
         <AnimatePresence mode="wait">
           {premioGanado && !girando ? (
-            <motion.div
-              key="resultado"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
+            <motion.div key="resultado" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
               className="p-5 rounded-xl text-center shadow-xl border-2"
-              style={{
-                backgroundColor: '#1F4B3F',
-                borderColor: '#7FB77E'
-              }}
-            >
+              style={{ backgroundColor: t.resultadoBg, borderColor: t.resultadoBorde }}>
               <div className="text-3xl mb-2">🎉</div>
-              <p className="text-beige font-bold text-lg mb-1">¡Felicidades!</p>
-              <p className="text-lima font-semibold text-lg">{premioGanado.texto}</p>
-              <p className="text-beige/70 text-xs mt-3">Muestra este mensaje al mesero</p>
+              <p className={`font-bold text-lg mb-1 ${t.resultadoTexto}`}>¡Felicidades!</p>
+              <p className={`font-semibold text-lg ${t.resultadoTexto2}`}>{premioGanado.texto}</p>
+              <p className={`text-xs mt-3 ${t.resultadoSubtexto}`}>Muestra este mensaje al mesero</p>
             </motion.div>
           ) : yaGiro && !girando ? (
-            <motion.div
-              key="usado"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-4"
-            >
-              <p className="text-verde-negro/60 text-sm">Ya utilizaste tu giro de hoy</p>
-              <p className="text-verde-negro/40 text-xs mt-2">
-                Próximo giro en <span className="font-mono">{tiempoRestante}</span>
-              </p>
+            <motion.div key="usado" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-4">
+              <p className={`text-sm ${t.usadoTexto}`}>Ya utilizaste tu giro de hoy</p>
+              <p className={`text-xs mt-2 ${t.usadoSub}`}>Próximo giro en <span className="font-mono">{tiempoRestante}</span></p>
             </motion.div>
           ) : null}
         </AnimatePresence>
@@ -352,79 +335,46 @@ const RuletaPremios = () => {
         transition={{ duration: 0.5, delay: 0.3 }}
         className="lg:hidden mt-4 w-full max-w-sm"
       >
-        <div className="bg-beige rounded-xl p-4 shadow-lg border-2 border-hoja/30">
-          <h3 className="text-bosque font-bold text-xs uppercase tracking-wider mb-3 text-center">Premios</h3>
+        <div className={`rounded-xl p-4 shadow-lg border-2 ${t.panel} ${t.panelBorde}`}>
+          <h3 className={`font-bold text-xs uppercase tracking-wider mb-3 text-center ${t.panelTitulo}`}>Premios</h3>
           <div className="grid grid-cols-2 gap-2">
             {premiosRuletaBienvenida.map((premio, i) => (
-              <div key={premio.id} className="flex items-center gap-2 bg-arena/50 rounded-lg px-2 py-1.5">
-                <span
-                  className="w-7 h-7 rounded flex items-center justify-center text-beige text-sm font-bold"
-                  style={{ backgroundColor: colorSegmento(i) }}
-                >
+              <div key={premio.id} className={`flex items-center gap-2 rounded-lg px-2 py-1.5 ${t.legendaItem}`}>
+                <span className={`w-7 h-7 rounded flex items-center justify-center ${t.numeroTexto} text-sm font-bold`}
+                  style={{ backgroundColor: t.numeroBg(i) }}>
                   {i + 1}
                 </span>
-                <span className="text-verde-negro text-sm font-medium truncate">{premio.corto}</span>
+                <span className={`text-sm font-medium truncate ${t.panelTexto}`}>{premio.corto}</span>
               </div>
             ))}
           </div>
         </div>
       </motion.div>
 
-      {/* Términos y condiciones */}
       <button
         onClick={() => setMostrarTerminos(true)}
-        className="mt-4 text-verde-negro/50 text-[10px] text-center underline hover:text-verde-negro/70 transition-colors"
+        className={`mt-4 text-[10px] text-center underline transition-colors ${t.terminosTexto} ${t.terminosHover}`}
       >
         Términos y condiciones
       </button>
 
-      {/* Modal de términos */}
       <AnimatePresence>
         {mostrarTerminos && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4"
-            onClick={() => setMostrarTerminos(false)}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ duration: 0.2 }}
-              className="bg-beige rounded-xl p-5 max-w-sm w-full shadow-2xl border-2 border-hoja/30"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="text-bosque font-bold text-sm uppercase tracking-wider mb-4 text-center">
-                Términos y Condiciones
-              </h3>
-              <ul className="text-verde-negro/80 text-xs space-y-2">
-                <li className="flex gap-2">
-                  <span className="text-bosque">•</span>
-                  <span>Promoción válida únicamente en el establecimiento.</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-bosque">•</span>
-                  <span>Un giro disponible cada 12 horas por dispositivo.</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-bosque">•</span>
-                  <span>Aplica un solo premio por mesa.</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-bosque">•</span>
-                  <span>Al canjear el premio, la cuenta de la mesa no podrá dividirse.</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-bosque">•</span>
-                  <span>No acumulable con otras promociones.</span>
-                </li>
+            onClick={() => setMostrarTerminos(false)}>
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} transition={{ duration: 0.2 }}
+              className={`rounded-xl p-5 max-w-sm w-full shadow-2xl border-2 ${t.modalBg} ${t.modalBorde}`}
+              onClick={(e) => e.stopPropagation()}>
+              <h3 className={`font-bold text-sm uppercase tracking-wider mb-4 text-center ${t.modalTitulo}`}>Términos y Condiciones</h3>
+              <ul className={`text-xs space-y-2 ${t.modalTexto}`}>
+                <li className="flex gap-2"><span className={t.modalBullet}>•</span><span>Promoción válida únicamente en el establecimiento.</span></li>
+                <li className="flex gap-2"><span className={t.modalBullet}>•</span><span>Un giro disponible cada 12 horas por dispositivo.</span></li>
+                <li className="flex gap-2"><span className={t.modalBullet}>•</span><span>Aplica un solo premio por mesa.</span></li>
+                <li className="flex gap-2"><span className={t.modalBullet}>•</span><span>Al canjear el premio, la cuenta de la mesa no podrá dividirse.</span></li>
+                <li className="flex gap-2"><span className={t.modalBullet}>•</span><span>No acumulable con otras promociones.</span></li>
               </ul>
-              <button
-                onClick={() => setMostrarTerminos(false)}
-                className="mt-5 w-full py-2 rounded-lg bg-bosque text-beige font-semibold text-sm hover:bg-bosque/90 transition-colors"
-              >
+              <button onClick={() => setMostrarTerminos(false)} className={`mt-5 w-full py-2 rounded-lg font-semibold text-sm transition-colors ${t.modalBtn}`}>
                 Entendido
               </button>
             </motion.div>
